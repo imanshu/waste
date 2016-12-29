@@ -1,0 +1,26 @@
+{
+  "name": "msbot",
+  "version": "1.0.0",
+  "description": "\"Build a bot in node js on Microsoft Bot Framework \"",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tirumalesh12/NodeMSbot.git"
+  },
+  "keywords": [
+    "bot"
+  ],
+  "author": "Tirumalesh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tirumalesh12/NodeMSbot/issues"
+  },
+  "homepage": "https://github.com/Tirumalesh12/NodeMSbot#readme",
+  "dependencies": {
+    "botbuilder": "^3.4.4",
+    "restify": "^4.3.0"
+  }
+}
