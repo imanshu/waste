@@ -6,6 +6,7 @@ var bot = new builder.BotConnectorBot({ appId: 'YourAppId', appSecret: 'YourAppS
 bot.add('/', function (session) {
     session.send('Hello World');
 	
+	
 });
 
 // Setup Restify Server
