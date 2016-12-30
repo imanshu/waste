@@ -5,6 +5,7 @@ var builder = require('botbuilder');
 var bot = new builder.BotConnectorBot({ appId: 'YourAppId', appSecret: 'YourAppSecret' });
 bot.add('/', function (session) {
     session.send('Hello World');
+	
 });
 
 // Setup Restify Server
