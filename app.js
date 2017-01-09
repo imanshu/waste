@@ -2,7 +2,7 @@ var restify = require('restify');
 var builder = require('botbuilder');
 
 
-var dialog = new builder.LuisDialog('https://api.projectoxford.ai/luis/v2.0/apps/56cb79d3-1f50-45fe-bee6-a7820ffe67ff?subscription-key=412111898d6f49a0b22467676f123ecb&q=hello&verbose=true');
+var dialog = new builder.LuisDialog('https://api.projectoxford.ai/luis/v2.0/apps/56cb79d3-1f50-45fe-bee6-a7820ffe67ff?subscription-key=412111898d6f49a0b22467676f123ecb&verbose=true&q=');
 // Create bot and add dialogs
 var bot = new builder.BotConnectorBot({ appId: '0ff6befd-526d-4bd1-a8d4-ba2351d4fabe', appSecret: 'jGuCQczXEi34Pb51DwdLpMy' });
 bot.add('/', dialog);
