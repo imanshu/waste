@@ -13,12 +13,12 @@ dialog.matches('Greeting', [
     function (session, args) {
 	console.log ('in greeting ');
 	session.send('Hello there! I am the notification bot. I can notify about the urgent orders');
-    builder.Prompts.text(session, "hiii, What is your name?");
+    builder.Prompts.choice(session, "hiii, What is your name?",["anshu","tiru"]);
     },
-    function (session, args, results) {
-	session.send("Hello %s", results.response);
-	session.dialogData.name = results.response;
-	session.send("Hello %s", session.userData.name);
+    function (session, results) {
+	session.send("Hello %s", results.response.entity);
+	session.dialogData.name = results.response.entity;
+	session.send("Hello %s", session.dialogData.name);
     }
 ]);
 // Handling unrecognized conversations.
