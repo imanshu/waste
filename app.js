@@ -12,7 +12,7 @@ bot.dialog('/', dialog);
 dialog.matches('Greeting', [function (session, args) {
 	console.log ('in greeting ');
 	session.send('Hello there! I am the notification bot. I can notify about the urgent orders');
-	if(session.userData)
+	if(session.userData.name)
     {builder.Prompts.text(session, "What is your name?");}	
     },
 	function (session, args, results){
