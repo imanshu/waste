@@ -9,10 +9,17 @@ var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
 bot.dialog('/', dialog);
 
 // Handling the Greeting intent. 
-dialog.matches('Greeting', function (session, args) {
+dialog.matches('Greeting', [function (session, args) {
 	console.log ('in greeting ');
-	session.send('Hello there! I am the notification bot. I can notify about the urgent orders');		
-});
+	session.send('Hello there! I am the notification bot. I can notify about the urgent orders');
+	if(session.userData == "undefined")
+    {builder.Prompts.text(session, "Please tell your name?");}	
+    },
+	function (session, args, results){
+		session.userData.name = results.response;
+		session.send("Hello %s", session.userData.name);
+    }
+]);
 // Handling unrecognized conversations.
 dialog.matches('None', function (session, args) {
 	console.log ('in none intent');	
