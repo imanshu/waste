@@ -13,7 +13,7 @@ dialog.matches('Greeting', [
     function (session, args) {
 	console.log ('in greeting ');
 	session.send('Hello there! I am the notification bot. I can notify about the urgent orders');
-    builder.Prompts.text(session, "What is your name?");
+    builder.Prompts.text(session, "hiii, What is your name?");
     },
     function (session, args, results) {
 	session.send("Hello %s", results.response);
