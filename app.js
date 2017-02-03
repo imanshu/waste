@@ -18,8 +18,12 @@ dialog.matches('Greeting', [
     function (session, results) {
 	session.send("Hello %s", results.response.entity);
 	session.dialogData.name = results.response.entity;
-	session.send("Hello %s", session.dialogData.name);
-    }
+	builder.Prompts.choice(session, "hiii, What is your email?",["anshu@gmail","tiru@gmail"]);
+    },
+	function (session, results) {
+	session.dialogData.email = results.response.entity;
+	session.send("Hello %s, is this your email? %s \n Seems Working!!!", session.dialogData.name,session.dialogData.email);
+	}
 ]);
 // Handling unrecognized conversations.
 dialog.matches('None', function (session, args) {
