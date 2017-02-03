@@ -75,11 +75,11 @@ callingApi = function(path, callback){
 var connector = new builder.ChatConnector({appId:"c60ece39-e97b-4f50-ae77-d0ac24f07a4f", appPassword:"tYQdi0sEppKbFwaFUOOKbJ4"});
 var bot = new builder.UniversalBot(connector);
 var recognizer = new builder.LuisRecognizer('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/c592677c-d9ec-435d-bada-77008d9fc147?subscription-key=412111898d6f49a0b22467676f123ecb&verbose=true&q=');
-var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
-bot.dialog('/', dialog);
+var intents = new builder.IntentDialog({ recognizers: [recognizer] });
+bot.dialog('/', intents);
 
 // Handling the Greeting intent. 
-dialog.matches('ShoeSearch' , 
+intents.matches('ShoeSearch' , 
     function (session, args, next) {
 	    console.log ('in shoesearch intent ');
 	    var shoe = builder.EntityRecognizer.findEntity(args.entities, 'Shoe');
@@ -101,18 +101,21 @@ dialog.matches('ShoeSearch' ,
 	    session.send('Hello there! I am the shoe search bot. You are looking for %s %s %s %s for %s of size %s',session.dialogData.brand,session.dialogData.type,session.dialogData.color,session.dialogData.shoe,session.dialogData.gender,session.dialogData.size);		
 	    callingApi(session.dialogData.path, function(data){	
 		showoutput(session,data.items);
+		session.send("done");
+		if(session.dialogData.gender=="")
+		{session.beginDialog('/Gender');}
 	    }) 		
 	})
 // Handling unrecognized conversations.
-dialog.matches('None', function (session, args) {
+intents.matches('None', function (session, args) {
 	console.log ('in none intent');	
-	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");			
+	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");
 });
-/*bot.dialog('/Gender', [
+bot.dialog('/Gender', [
     function (session, args) {
 	session.send("Enter your gender");		
     }
-]);*/
+]);
 
 // Setup Restify Server
 var server = restify.createServer();
