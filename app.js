@@ -101,6 +101,7 @@ intents.matches('ShoeSearch' , [
 	    session.send('Hello there! I am the shoe search bot. You are looking for %s %s %s %s for %s of size %s',session.dialogData.brand,session.dialogData.type,session.dialogData.color,session.dialogData.shoe,session.dialogData.gender,session.dialogData.size);		
 	    callingApi(session.dialogData.path, function(data){	
 		    showoutput(session,data.items);
+			next();
 	    }) 
 		if(session.dialogData.gender==""){
 		session.send("next");
@@ -118,7 +119,6 @@ intents.matches('ShoeSearch' , [
 		//session.dialogData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.dialogData.gender,session.dialogData.type) +"&facet=on&facet.filter=gender:"+ session.dialogData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
 	    callingApi(session.dialogData.path, function(data){	
 		    showoutput(session,data.items);
-			next();
 		})
 	}
 ])
