@@ -136,7 +136,7 @@ bot.dialog('/Gender', [
 	    callingApi(session.userData.path, function(data){	
 		showoutput(session,data.items);	
 		if(!data.items){
-			session.endDialog();
+			session.beginDialog('/Gender');
 		}else if(session.userData.type==""){
 		    session.beginDialog('/Type');
 		}else if(session.userData.brand==""){
@@ -163,7 +163,7 @@ bot.dialog('/Type', [
 	    callingApi(session.userData.path, function(data){	
 		showoutput(session,data.items);	
 		if(!data.items){
-			session.endDialog();
+			session.beginDialog('/Type');
 		}else if(session.userData.brand==""){
 		    session.beginDialog('/Brand');
 		}else if(session.userData.color==""){
@@ -188,7 +188,7 @@ bot.dialog('/Brand', [
 	    callingApi(session.userData.path, function(data){	
 		showoutput(session,data.items);
         if(!data.items){
-			session.endDialog();
+			session.beginDialog('/Brand');
 		}else if(session.userData.color==""){
 		    session.beginDialog('/Color');
 		}else if(session.userData.size==""){
@@ -211,7 +211,7 @@ bot.dialog('/Color', [
 	    callingApi(session.userData.path, function(data){	
 		showoutput(session,data.items);	
 		if(!data.items){
-			session.endDialog();
+			session.beginDialog('/Color');
 		}else if(session.userData.size==""){
 		    session.beginDialog('/Size');
 		}
@@ -230,7 +230,10 @@ bot.dialog('/Size', [
 		}
         session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	    callingApi(session.userData.path, function(data){	
-		showoutput(session,data.items);			
+		showoutput(session,data.items);	
+        if(!data.items){
+			session.beginDialog('/Size');
+		}		
     })
 	}
 ]);
