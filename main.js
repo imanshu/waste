@@ -65,6 +65,10 @@ showoutput = function(session,items){
 				       .tap(builder.CardAction.openUrl(session, items[i].productUrl))
 				i++;
 				}
+		card[i] = new builder.HeroCard(session)
+		            .buttons([
+					       builder.CardAction.dialogAction(session,"Show More"),
+				       ])
 		var msg = new builder.Message(session)
 				.attachmentLayout(builder.AttachmentLayout.carousel)
 				.attachments(card);
@@ -353,6 +357,7 @@ bot.dialog('/Size', [
 				session.beginDialog('/Size');
 			}else {
 				session.beginDialog('/Show more');
+				//builder.Prompts.choice(session, " ",['Show more','End Conversation']);
 			}
 		})
 	}
@@ -370,10 +375,6 @@ bot.dialog('/Show more', [
 			callingApi(session.userData.path, function(data){
 				showoutput(session,data.items);
 				if(!data.items){
-					session.send("You can start your new conversation now");
-					session.endDialog();
-				}else if(data.items[9]== null){
-					session.send("End of Results");
 					session.send("You can start your new conversation now");
 					session.endDialog();
 				}else {
