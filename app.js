@@ -44,32 +44,89 @@ capitalize = function(str) {
 	return str;
 }
 
-showoutput = function(session,items){
+showoutput = function(session,data){
 	session.sendTyping();
 	var i=0;
 	var card = [];
-	if(!items){
+	if(!data.items){
 		session.send("Try another search. No product exists.")
 	}else{
-		while(items[i]){
+		while(data.items[i]){
 		card[i] =  new builder.HeroCard(session)
-		               .title(items[i].name)
-					   .subtitle(items[i].salePrice + '$')
+		               .title(data.items[i].name)
+					   .subtitle(data.items[i].salePrice + '$')
 				       .images([
-					       builder.CardImage.create(session, items[i].thumbnailImage) 
+					       builder.CardImage.create(session, data.items[i].thumbnailImage) 
 				       ])
 				       .buttons([
-					       builder.CardAction.openUrl(session, items[i].productUrl,"Buy Now"),
-						   builder.CardAction.openUrl(session, items[i].addToCartUrl, "Add to Cart"),
+					       builder.CardAction.openUrl(session, data.items[i].productUrl,"Buy Now"),
+						   builder.CardAction.openUrl(session, data.items[i].addToCartUrl, "Add to Cart"),
 				       ])
-				       .tap(builder.CardAction.openUrl(session, items[i].productUrl))
+				       .tap(builder.CardAction.openUrl(session, data.items[i].productUrl))
 				i++;
 				}
+		session.userData.colors = colorsArray(session, data);
+		session.userData.brands = brandsArray(session, data);
+		session.userData.sizes = sizesArray(session, data);
 		var msg = new builder.Message(session)
 				.attachmentLayout(builder.AttachmentLayout.carousel)
 				.attachments(card);
 				session.send(msg);
 	}			
+}
+
+brandsArray = function(session,data){
+    brands = [];	
+	var j=0;
+	var k=0;
+	while(data.facets[j]){
+	if(data.facets[j].name == "brand"){
+		while(data.facets[j].facetValues[k]){
+			brands[k] = data.facets[j].facetValues[k].name;
+			k++;						
+			}
+		break;
+	}
+	j++;
+	}
+	brands.push("Any Brand");
+	return brands;
+}
+
+sizesArray = function(session,data){
+    sizes = [];	
+	var j=0;
+	var k=0;
+	while(data.facets[j]){
+	if(data.facets[j].name == "shoe_size"){
+		while(data.facets[j].facetValues[k]){
+			sizes[k] = data.facets[j].facetValues[k].name;
+			k++;						
+			}
+		break;
+	}
+	j++;
+	}
+	sizes.push("Any Size");
+	return sizes;
+}
+
+colorsArray = function(session,data){
+    colors = [];	
+	var j=0;
+	var k=0;
+	while(data.facets[j]){
+	if(data.facets[j].name == "color"){
+		while(data.facets[j].facetValues[k]){
+			colors[k] = data.facets[j].facetValues[k].name;
+			k++;						
+			}
+		break;
+	}
+	j++;
+	}
+	colors.push("Any Color");
+	return colors;
 }
 
 callingApi = function(path, callback){
@@ -119,9 +176,9 @@ dialog.matches('ShoeSearch' ,
 		type: type ? capitalize(type.entity) : "",
 		size: size ? size.entity : "",
 		path: "",
-		brands: ['hi','hi'],
-		colors: ['hi'],
-		sizes: ['hi']
+		brands: [],
+		colors: [],
+		sizes: []
 	};
 	if(session.userData.brand=="nike"){ session.userData.brand = "Nike"; }
 	if(session.userData.brand=="puma"){session.userData.brand = "PUMA";}
@@ -138,33 +195,7 @@ dialog.matches('ShoeSearch' ,
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	//session.send('Hello there! I am the shoe search bot. You are looking for %s %s %s %s for %s of size %s',session.userData.brand,session.userData.type,session.userData.color,session.userData.shoe,session.userData.gender,session.userData.size);		
 	callingApi(session.userData.path, function(data){	
-		showoutput(session,data.items);
-		var j=0;
-		var k=0;
-		while(data.facets[j]){
-			if(data.facets[j].name == "brand"){
-				while(k<9){
-					session.userData.brands[k] = data.facets[j].facetValues[k].name;
-                    k++;						
-					}
-				break;
-			}
-			j++;
-		}
-		session.userData.brands.push("Any Brand");
-		j=0;
-		k=0;
-		while(data.facets[j]){
-			if(data.facets[j].name == "color"){
-				while(k<7){
-					session.userData.colors[k] = data.facets[j].facetValues[k].name;
-					k++;						
-					}
-				break;
-			}
-			j++;
-		}
-		session.userData.colors.push("Any Color");
+		showoutput(session,data);
 		if(!data.items){
 			session.endDialog();
 		}else if(session.userData.gender==""){
@@ -198,7 +229,7 @@ bot.dialog('/Gender', [
 		session.userData.gender = results.response.entity;
 		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 		callingApi(session.userData.path, function(data){	
-			showoutput(session,data.items);	
+			showoutput(session,data);	
 			if(!data.items){
 				session.beginDialog('/Gender');
 			}else if(session.userData.type==""){
@@ -228,21 +259,8 @@ bot.dialog('/Type', [
 		}
 		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 		callingApi(session.userData.path, function(data){
-			showoutput(session,data.items);
+			showoutput(session,data);
 			session.userData.brands = ['hi'];
-			var j=0;
-			var k=0;
-			while(data.facets[j]){
-				if(data.facets[j].name == "brand"){
-					while(k<9){
-						session.userData.brands[k] = data.facets[j].facetValues[k].name;
-                        k++;
-						}
-					break;
-				}
-				j++;
-			}
-			session.userData.brands.push("Any Brand");
 			if(!data.items){
 				session.beginDialog('/Type');
 			}else if(session.userData.brand==""){
@@ -271,21 +289,7 @@ bot.dialog('/Brand', [
 		session.userData.brand = removeSpace(session.userData.brand);
 		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 		callingApi(session.userData.path, function(data){	
-			showoutput(session,data.items);
-			session.userData.colors = ['hi'];
-			var j=0;
-		    var k=0;
-		    while(data.facets[j]){
-				if(data.facets[j].name == "color"){
-					while(data.facets[j].facetValues[k]){
-						session.userData.colors[k] = data.facets[j].facetValues[k].name;
-						k++;						
-						}
-					break;
-				}
-				j++;
-			}
-			session.userData.colors.push("Any Color");
+			showoutput(session,data);
 			if(!data.items){
 				session.beginDialog('/Brand');
 			}else if(session.userData.color==""){
@@ -302,7 +306,7 @@ bot.dialog('/Brand', [
 // Handling the Color dialog. 
 bot.dialog('/Color', [
 	function (session, args) {
-		builder.Prompts.choice(session, "Please select the brand.",session.userData.colors);
+		builder.Prompts.choice(session, "Please select the color.",session.userData.colors);
 	},
 	function (session, results) {
 		session.userData.color = results.response.entity;
@@ -311,20 +315,7 @@ bot.dialog('/Color', [
 		}
 		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 		callingApi(session.userData.path, function(data){
-			showoutput(session,data.items);
-			j=0;
-			k=0;
-		    while(data.facets[j]){
-			    if(data.facets[j].name == "shoe_size"){
-			    	while(data.facets[j].facetValues[k]){
-				    	session.userData.sizes[k] = data.facets[j].facetValues[k].name;
-				    	k++;						
-					    }
-				    break;
-			    }
-			    j++;
-		    }
-			session.userData.sizes.push("Any Size");
+			showoutput(session,data);
 			if(!data.items){
 				session.beginDialog('/Color');
 			}else if(session.userData.size==""){
@@ -348,9 +339,11 @@ bot.dialog('/Size', [
 		}
 		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 		callingApi(session.userData.path, function(data){	
-			showoutput(session,data.items);	
-			if(!data.items){
-				session.beginDialog('/Size');
+			showoutput(session,data);	
+			if(data.items[9] === undefined){
+					session.send("End of Results");
+					session.send("You can start your new conversation now");
+					session.endDialog();
 			}else {
 				session.beginDialog('/Show more');
 			}
@@ -368,11 +361,11 @@ bot.dialog('/Show more', [
 			session.userData.page += 1;
 			session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start="+ session.userData.page +"1&numItems=10";
 			callingApi(session.userData.path, function(data){
-				showoutput(session,data.items);
+				showoutput(session,data);
 				if(!data.items){
 					session.send("You can start your new conversation now");
 					session.endDialog();
-				}else if(data.items[9]== null){
+				}else if(data.items[9] === undefined){
 					session.send("End of Results");
 					session.send("You can start your new conversation now");
 					session.endDialog();
