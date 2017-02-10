@@ -81,7 +81,7 @@ brandsArray = function(session,data){
 	var k=0;
 	while(data.facets[j]){
 	if(data.facets[j].name == "brand"){
-		while((data.facets[j].facetValues[k])&&(k<9)){
+		while(data.facets[j].facetValues[k]){
 			brands[k] = data.facets[j].facetValues[k].name;
 			k++;						
 			}
@@ -99,7 +99,7 @@ sizesArray = function(session,data){
 	var k=0;
 	while(data.facets[j]){
 	if(data.facets[j].name == "shoe_size"){
-		while((data.facets[j].facetValues[k])&&(k<9)){
+		while(data.facets[j].facetValues[k]){
 			sizes[k] = data.facets[j].facetValues[k].name;
 			k++;						
 			}
@@ -117,7 +117,7 @@ colorsArray = function(session,data){
 	var k=0;
 	while(data.facets[j]){
 	if(data.facets[j].name == "color"){
-		while((data.facets[j].facetValues[k])&&(k<9)){
+		while(data.facets[j].facetValues[k]){
 			colors[k] = data.facets[j].facetValues[k].name;
 			k++;						
 			}
@@ -168,6 +168,7 @@ dialog.matches('ShoeSearch' ,
 	var color = builder.EntityRecognizer.findEntity(args.entities, 'Color');
 	var type = builder.EntityRecognizer.findEntity(args.entities, 'Shoe::Shoe_type');
 	var size = builder.EntityRecognizer.findEntity(args.entities, 'Shoe::Shoe_size');
+	session.send(brand.entity);
 	session.userData = {
 		shoe: shoe ? shoe.entity : "",
 		gender: gender ? capitalize(gender.entity) : "",
@@ -187,10 +188,10 @@ dialog.matches('ShoeSearch' ,
 	if(session.userData.brand=="vans"){session.userData.brand = "VANS";}
 	if(session.userData.brand=="avia"){session.userData.brand = "Avia";}
 	if(session.userData.brand=="asics"){session.userData.brand = "ASICS";}
-	if(session.userData.brand=="danskin now"){session.userData.brand = "Danskin Now";}
-	if(session.userData.brand=="new balance"){session.userData.brand = "New Balance";}
+	if((session.userData.brand=="danskin")||(session.userData.brand=="now")){session.userData.brand = "Danskin Now";}
+	if((session.userData.brand=="new")||(session.userData.brand=="balance")){session.userData.brand = "New Balance";}
 	if(session.userData.brand=="puma"){session.userData.brand = "PUMA";}
-    removeSpace(session.userData.brand);
+    session.userData.brand = removeSpace(session.userData.brand);
 	session.userData.page = 0;
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	//session.send('Hello there! I am the shoe search bot. You are looking for %s %s %s %s for %s of size %s',session.userData.brand,session.userData.type,session.userData.color,session.userData.shoe,session.userData.gender,session.userData.size);		
@@ -209,10 +210,10 @@ dialog.matches('ShoeSearch' ,
 		}else if(session.userData.size==""){
 			session.beginDialog('/Size');
 		}else {
-			session.beginDialog('/Show more');
+			session.endDialog();
 		}	
 	})  	
-})
+});
 
 // Handling Greeting conversations.
 dialog.matches('Greeting', function (session, args) {
@@ -248,7 +249,7 @@ bot.dialog('/Gender', [
 			}else if(session.userData.size==""){
 				session.beginDialog('/Size');
 			}else {
-				session.beginDialog('/Show more');			
+				session.endDialog();			
 			}	
 		})
 	}
@@ -267,6 +268,7 @@ bot.dialog('/Type', [
 		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 		callingApi(session.userData.path, function(data){
 			showoutput(session,data);
+			session.userData.brands = ['hi'];
 			if(!data.items){
 				session.beginDialog('/Type');
 			}else if(session.userData.brand==""){
@@ -276,7 +278,7 @@ bot.dialog('/Type', [
 			}else if(session.userData.size==""){
 				session.beginDialog('/Size');
 			}else {
-				session.beginDialog('/Show more');
+				session.endDialog();
 			}	
 		})
 	}
@@ -303,7 +305,7 @@ bot.dialog('/Brand', [
 			}else if(session.userData.size==""){
 				session.beginDialog('/Size');
 			}else {
-				session.beginDialog('/Show more');
+				session.endDialog();
 			}		
 		})
 	}
@@ -327,7 +329,7 @@ bot.dialog('/Color', [
 			}else if(session.userData.size==""){
 				session.beginDialog('/Size');
 			}else {
-				session.beginDialog('/Show more');
+				session.endDialog();
 			}
 		})
 	}
