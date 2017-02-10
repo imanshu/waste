@@ -81,7 +81,7 @@ brandsArray = function(session,data){
 	var k=0;
 	while(data.facets[j]){
 	if(data.facets[j].name == "brand"){
-		while(data.facets[j].facetValues[k]){
+		while((data.facets[j].facetValues[k])&&(k<9)){
 			brands[k] = data.facets[j].facetValues[k].name;
 			k++;						
 			}
@@ -99,7 +99,7 @@ sizesArray = function(session,data){
 	var k=0;
 	while(data.facets[j]){
 	if(data.facets[j].name == "shoe_size"){
-		while(data.facets[j].facetValues[k]){
+		while((data.facets[j].facetValues[k])&&(k<9)){
 			sizes[k] = data.facets[j].facetValues[k].name;
 			k++;						
 			}
@@ -117,7 +117,7 @@ colorsArray = function(session,data){
 	var k=0;
 	while(data.facets[j]){
 	if(data.facets[j].name == "color"){
-		while(data.facets[j].facetValues[k]){
+		while((data.facets[j].facetValues[k])&&(k<9)){
 			colors[k] = data.facets[j].facetValues[k].name;
 			k++;						
 			}
@@ -214,6 +214,13 @@ dialog.matches('ShoeSearch' ,
 	})  	
 })
 
+// Handling Greeting conversations.
+dialog.matches('Greeting', function (session, args) {
+	console.log ('in greeting intent');	
+	session.send("Greetings, Welcome to the Walmart Digital Shoe Bot!!");
+    session.send("What are you looking for?");
+});
+
 // Handling unrecognized conversations.
 dialog.matches('None', function (session, args) {
 	console.log ('in none intent');	
@@ -260,7 +267,6 @@ bot.dialog('/Type', [
 		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 		callingApi(session.userData.path, function(data){
 			showoutput(session,data);
-			session.userData.brands = ['hi'];
 			if(!data.items){
 				session.beginDialog('/Type');
 			}else if(session.userData.brand==""){
