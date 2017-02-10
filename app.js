@@ -336,6 +336,9 @@ bot.dialog('/Color', [
 // Handling the Size dialog. 
 bot.dialog('/Size', [
 	function (session, args) {
+		if(session.userData.sizes[1] === undefined ){
+			session.userData.sizes = ['6','7','8','9','10','11'];
+		}
 		builder.Prompts.choice(session, "Please select your size.",session.userData.sizes);
 	},
 	function (session, results) {
