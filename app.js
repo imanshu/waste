@@ -1,3 +1,4 @@
+require('dotenv/config');
 var restify = require('restify');
 var builder = require('botbuilder');
 var http = require('http');
@@ -91,12 +92,13 @@ showoutput = function(session,data){
 				       .tap(builder.CardAction.openUrl(session, data.items[i].productUrl))
 				i++;
 				}
-				
+		if(data.items[9] !== undefined){	
 		card[i] = new builder.HeroCard(session)
                       .subtitle('Want to see Similar kind of shoes? Click below')
                       .buttons([
 					       builder.CardAction.imBack(session, "Show more", "Show more"),
 				       ])
+		}
 		session.userData.colors = colorsArray(session, data);
 		session.userData.brands = brandsArray(session, data);
 		session.userData.sizes = sizesArray(session, data);
@@ -184,7 +186,7 @@ callingApi = function(path, callback){
 }
 
 // Create bot and add dialogs
-var connector = new builder.ChatConnector({appId:"c60ece39-e97b-4f50-ae77-d0ac24f07a4f", appPassword:"tYQdi0sEppKbFwaFUOOKbJ4"});
+var connector = new builder.ChatConnector({appId: process.env.APP_ID, appPassword:"tYQdi0sEppKbFwaFUOOKbJ4"});
 var bot = new builder.UniversalBot(connector);
 var recognizer = new builder.LuisRecognizer('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/ab8bc42f-9e84-4cf5-96e7-c59a54e552b6?subscription-key=412111898d6f49a0b22467676f123ecb&verbose=true&q=');
 var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
