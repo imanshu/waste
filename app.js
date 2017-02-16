@@ -11,7 +11,7 @@ promptThis = function(session){
 			session.beginDialog('/Brand');
 		}else if(session.userData.color==""){
 			builder.Prompts.choice(session, "Please select the color.",session.userData.colors);
-		}else {
+		}else if(session.userData.size==""){
 			builder.Prompts.choice(session, "Please select the color.",session.userData.sizes);
 		}
 }
@@ -301,8 +301,14 @@ dialog.matches('Size', function (session, args, results) {
 	}
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
+	if(!data.items){
+		session.endDialog();
+	}else if(data.items[9] === undefined){
+		session.send("End of Results");
+		session.endDialog();
+			    }
 	promptThis(session);
-	    session.endDialog();
+	session.endDialog();
 	})
 })
 
@@ -322,7 +328,6 @@ dialog.matches('Show more', function (session, args) {
 			callingApi(session.userData.path, function(data){
 				showoutput(session,data);
 				if(!data.items){
-		            session.send("Try another search. No product exists.")
 		            session.endDialog();
 	            }else if(data.items[9] === undefined){
 					session.send("End of Results");
