@@ -340,6 +340,32 @@ dialog.matches('Show more', function (session, args) {
 			})
 })
 
+
+dialog.matches('Link account',
+  function (session) {
+    var message = new builder.Message(session)
+      .sourceEvent({
+        facebook: {
+          attachment: {
+            type: 'template',
+            payload: {
+              template_type: 'generic',
+              elements: [{
+                title: 'Welcome to Account Linking',
+                image_url: 'https://github.com/vjrantal/account-linking-demo-bot/blob/master/static/linking.png',
+                buttons: [{
+                  type: 'account_link',
+                  url: 'https://github.com/vjrantal/account-linking-demo-bot/blob/master/static/index.html'
+                }]
+              }]
+            }
+          }
+        }
+      });
+    session.endDialog(message);
+  }
+);
+
 // Handling Greeting intent.
 dialog.matches('Greeting', function (session, args) {
 	console.log ('in greeting intent');	
