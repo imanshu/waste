@@ -352,10 +352,10 @@ dialog.matches('Link account',
               template_type: 'generic',
               elements: [{
                 title: 'Welcome to Account Linking',
-                image_url: 'https://github.com/vjrantal/account-linking-demo-bot/blob/master/static/linking.png',
+                image_url: 'http://helloworldbot12.azurewebsites.net/static/linking.png',
                 buttons: [{
                   type: 'account_link',
-                  url: 'https://github.com/vjrantal/account-linking-demo-bot/blob/master/static/index.html'
+                  url: 'http://helloworldbot12.azurewebsites.net/static/index.html'
                 }]
               }]
             }
