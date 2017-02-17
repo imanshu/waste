@@ -411,6 +411,26 @@ server.post('/api/messages', connector.listen());
 server.listen(process.env.port || 5000, function () {
     console.log('%s listening to %s', server.name, server.url); 
 });
+
+server.get('/authorize', restify.queryParser(), function (req, res, next) {
+  if (req.query && req.query.redirect_uri && req.query.username) {
+    var username = req.query.username;
+
+    // Here, it would be possible to take username (and perhaps password and other data)
+    // and do some verifications with a backend system. The authorization_code query string
+    // argument is an arbitrary pass-through value that could be stored as well
+    // to enable verifying it once Facebook sends the `Account Linking webhook event`
+    // that we handle below. In this case, we are passing the username via the authorization_code
+    // since that avoids a need for an external databases in this simple scenario.
+
+    var redirectUri = req.query.redirect_uri + '&authorization_code=' + username;
+    return res.redirect(redirectUri, next);
+  } else {
+    return res.send(400, 'Request did not contain redirect_uri and username in the query string');
+  }
+});
+
+
 server.get(/\/static\/?.*/, restify.serveStatic({
   directory: __dirname
 }));
