@@ -2,6 +2,8 @@ var restify = require('restify');
 var builder = require('botbuilder');
 var http = require('http');
 
+var FRONTEND_URL = 'https://helloworldbot12.azurewebsites.net' || 'https://localhost';
+
 promptThis = function(session){ 
         if(session.userData.gender==""){
 			builder.Prompts.choice(session, "Please select the gender.",['Men','Women']);
@@ -352,10 +354,10 @@ dialog.matches('Link account',
               template_type: 'generic',
               elements: [{
                 title: 'Welcome to Account Linking',
-                image_url: 'http://helloworldbot12.azurewebsites.net/static/linking.png',
+                image_url: FRONTEND_URL + '/static/linking.png',
                 buttons: [{
                   type: 'account_link',
-                  url: 'http://helloworldbot12.azurewebsites.net/static/index.html'
+                  url: FRONTEND_URL + '/static/index.html'
                 }]
               }]
             }
@@ -371,12 +373,14 @@ dialog.matches('Greeting', function (session, args) {
 	console.log ('in greeting intent');	
 	session.send("Greetings, Welcome to the Walmart Digital Shoe Bot!!");
     session.send("What are you looking for today?");
+	session.endDialog();
 });
 
 // Handling unrecognized conversations.
 dialog.matches('None', function (session, args) {
 	console.log ('in none intent');	
-	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");			
+	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");
+    session.endDialog();	
 });
 
 // Handling the Brand dialog. 
@@ -407,3 +411,6 @@ server.post('/api/messages', connector.listen());
 server.listen(process.env.port || 5000, function () {
     console.log('%s listening to %s', server.name, server.url); 
 });
+server.get(/\/static\/?.*/, restify.serveStatic({
+  directory: __dirname
+}));
