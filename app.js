@@ -125,7 +125,7 @@ var message = new builder.Message(session)
 		   }
 		}
 	  })
-				session.send(msg);			
+				session.send(message);			
 }
 }
 
