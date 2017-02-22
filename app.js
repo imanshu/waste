@@ -120,7 +120,7 @@ var message = new builder.Message(session)
             "type":"template",			   
             "payload": {
 				"template_type": "generic",
-				"elements": JSON.stringify(card, null, 2) ,
+				"elements": JSON.stringify(card),
 			}
 		   }
 		}
