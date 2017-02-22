@@ -84,7 +84,7 @@ showoutput = function(session,data){
 		card[i] = { "title"    : data.items[i].name,
 					"subtitle" : data.items[i].salePrice + '$',
 					"image_url": data.items[i].thumbnailImage ,
-					"buttons"  : [
+				/*	"buttons"  : [
 					{
 						"type" : "web_url",
 						"url"  : data.items[i].productUrl,
@@ -96,7 +96,7 @@ showoutput = function(session,data){
 						"url": data.items[i].addToCartUrl, 
 						"title": "Add to Cart",
 						"webview_height_ratio": "tall",
-					 }],
+					 }],  */
 		          }
 				  i++;
 				}
