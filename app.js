@@ -79,9 +79,10 @@ showoutput = function(session,data){
 	if(!data.items){
 		session.send("Try another search. No product exists.")
 		session.endDialog();
-	}else{
+	}else {
 		while(data.items[i]){
-		card[i] = { "title"    : data.items[i].name,
+		card[i] = { 
+		            "title"    : data.items[i].name,
 					"subtitle" : data.items[i].salePrice + '$',
 					"image_url": data.items[i].thumbnailImage ,
 					"buttons"  : [
@@ -89,43 +90,45 @@ showoutput = function(session,data){
 						"type" : "web_url",
 						"url"  : data.items[i].productUrl,
 						"title": "Show Item",
-						"webview_height_ratio" : "compact",
+						"webview_height_ratio" : "tall"
 					 }, 
 					 {
 						"type": "web_url",
 						"url": data.items[i].addToCartUrl, 
 						"title": "Add to Cart",
-						"webview_height_ratio": "tall",
-					 }],  
+						"webview_height_ratio": "tall"
+					 }] 
 		          }
 				  i++;
 				}
-		if(data.items[9] !== undefined){	
-		card[i] = {    "text": "Want to see more similar kind of shoes?",
-                       "buttons":[
-                       {
-                          "type":"postback",
-                          "title":"Show More",
-                          "payload":"Show More"
-		               }]
-		         }
-		}
 		session.userData.colors = colorsArray(session, data);
 		session.userData.brands = brandsArray(session, data);
 		session.userData.sizes = sizesArray(session, data);
-var message = new builder.Message(session)
+    var message = new builder.Message(session)
       .sourceEvent({
         facebook: {
            "attachment":{
             "type":"template",			   
             "payload": {
 				"template_type": "generic",
-				"elements": JSON.stringify(card),
+				"elements": JSON.stringify(card, null, 4)
 			}
 		   }
 		}
 	  })
-				session.send(message);			
+	session.send(message);
+	if(data.items[9] !== undefined){	
+		var showmoreMsg = new builder.Message(session)
+            .attachments([
+                new builder.HeroCard(session)
+                    .title("Browse More")
+                    .subtitle("Want to see Similar kind of shoes? Click below")
+					.buttons([
+                        builder.CardAction.imBack(session, "Show more", "Show me More")
+                    ])
+                    ]);
+        session.send(showmoreMsg);
+	}
 }
 }
 
@@ -406,7 +409,7 @@ server.post('/api/messages', connector.listen());
 server.listen(process.env.port || 5000, function () {
     console.log('%s listening to %s', server.name, server.url); 
 });
-
+/*
 server.get('/authorize', restify.queryParser(), function (req, res, next) {
   if (req.query && req.query.redirect_uri && req.query.username) {
     var username = req.query.username;
@@ -425,7 +428,7 @@ server.get('/authorize', restify.queryParser(), function (req, res, next) {
   }
 });
 
-
+*/
 server.get(/\/static\/?.*/, restify.serveStatic({
   directory: __dirname
 }));
