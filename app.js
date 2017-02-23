@@ -87,6 +87,40 @@ showoutput = function(session,data){
 					"image_url": data.items[i].thumbnailImage ,
 					"buttons"  : [
 					{
+                        "type":"payment",
+                        "title":"buy",
+                        "payload":"DEVELOPER_DEFINED_PAYLOAD",
+                        "payment_summary":{
+                        "currency":"USD",
+                        "payment_type":"FIXED_AMOUNT",
+                        "is_test_payment" : true, 
+                        "merchant_name":"Walmart",
+                        "requested_user_info":[
+                          "shipping_address",
+                          "contact_name",
+                          "contact_phone",
+                          "contact_email"
+                        ],
+                        "price_list":[
+                           {
+                             "label":  "Subtotal",
+                             "amount": data.items[i].salePrice + '$'
+                           },
+                           {
+                             "label":"Taxes",
+                             "amount": ((0.1175)*(parseInt(data.items[i].salePrice))).toString() + '$'
+                           },
+						   {
+                             "label":"Shipping",
+                             "amount":data.items[i].standardShipRate + '$'
+                           },
+						   {
+                             "label":  "TOTAL",
+                             "amount": (parseInt(data.items[i].salePrice) + ((0.1175)*(parseInt(data.items[i].salePrice))) + parseInt(data.items[i].standardShipRate)).toString() + '$'
+                           }
+                         ]
+                       }
+                    },{
 						"type" : "web_url",
 						"url"  : data.items[i].productUrl,
 						"title": "Show Item",
