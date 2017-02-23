@@ -86,7 +86,7 @@ showoutput = function(session,data){
 					"subtitle" : data.items[i].salePrice + '$',
 					"image_url": data.items[i].thumbnailImage ,
 					"buttons"  : [
-		        	{
+		        /*	{
                         "type":"payment",
                         "title":"buy",
                         "payload": {
@@ -123,7 +123,7 @@ showoutput = function(session,data){
                            }
                          ]
                        }
-                  }, {
+                  }, */{
 						"type" : "web_url",
 						"url"  : data.items[i].productUrl,
 						"title": "Show Item",
