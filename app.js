@@ -91,7 +91,7 @@ showoutput = function(session,data){
                         "title":"buy",
                         "payload": {
 				                   "template_type": "generic",
-				                   "elements": "")
+				                   "elements": ""
 			                       },
                         "payment_summary":{
                         "currency":"USD",
