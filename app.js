@@ -86,10 +86,10 @@ showoutput = function(session,data){
 					"subtitle" : data.items[i].salePrice + '$',
 					"image_url": data.items[i].thumbnailImage ,
 					"buttons"  : [
-		/*			{
+		        	{
                         "type":"payment",
                         "title":"buy",
-                        "payload":"DEVELOPER_DEFINED_PAYLOAD",
+                        "payload":"action?None",
                         "payment_summary":{
                         "currency":"USD",
                         "payment_type":"FIXED_AMOUNT",
@@ -120,7 +120,7 @@ showoutput = function(session,data){
                            }
                          ]
                        }
-               },*/  {
+                  }, {
 						"type" : "web_url",
 						"url"  : data.items[i].productUrl,
 						"title": "Show Item",
@@ -410,6 +410,12 @@ dialog.matches('Greeting', function (session, args) {
 
 // Handling unrecognized conversations.
 dialog.matches('None', function (session, args) {
+	console.log ('in none intent');	
+	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");
+    session.endDialog();	
+});
+
+bot.dialog('None', function (session, args) {
 	console.log ('in none intent');	
 	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");
     session.endDialog();	
