@@ -72,6 +72,23 @@ capitalize = function(str) {
 	return str;
 }
 
+showItem = function(session, data){
+	session.send("Sure, Have a look");
+	card =  new builder.HeroCard(session)
+		               .title(data.name)
+					   .subtitle(data.salePrice + '$')
+				       .images([
+					       builder.CardImage.create(session, data.thumbnailImage) 
+				       ])
+				       .buttons([
+					       builder.CardAction.postBack(session, "add item" +(data.items[i].itemId).toString() + "to cart","ADD to Cart"),
+						   builder.CardAction.postBack(session, "Show more", "Show more"),
+				       ])
+	var item = new builder.Message(session)
+				.attachments(card);
+	session.send(item);
+}
+
 showoutput = function(session,data){
 	session.sendTyping();
 	var i=0;
@@ -79,95 +96,38 @@ showoutput = function(session,data){
 	if(!data.items){
 		session.send("Try another search. No product exists.")
 		session.endDialog();
-	}else {
+	}else{
 		while(data.items[i]){
-		card[i] = { 
-		            "title"    : data.items[i].name,
-					"subtitle" : data.items[i].salePrice + '$',
-					"image_url": data.items[i].thumbnailImage ,
-					"buttons"  : [
-		        /*	{
-                        "type":"payment",
-                        "title":"buy",
-                        "payload": {
-				                   "template_type": "generic",
-				                   "elements": ""
-			                       },
-                        "payment_summary":{
-                        "currency":"USD",
-                        "payment_type":"FIXED_AMOUNT",
-                        "is_test_payment" : true, 
-                        "merchant_name":"Walmart",
-                        "requested_user_info":[
-                          "shipping_address",
-                          "contact_name",
-                          "contact_phone",
-                          "contact_email"
-                        ],
-                        "price_list":[
-                           {
-                             "label":  "Subtotal",
-                             "amount": data.items[i].salePrice + '$'
-                           },
-                           {
-                             "label":"Taxes",
-                             "amount": ((0.1175)*(parseInt(data.items[i].salePrice))).toString() + '$'
-                           },
-						   {
-                             "label":"Shipping",
-                             "amount":data.items[i].standardShipRate + '$'
-                           },
-						   {
-                             "label":  "TOTAL",
-                             "amount": (parseInt(data.items[i].salePrice) + ((0.1175)*(parseInt(data.items[i].salePrice))) + parseInt(data.items[i].standardShipRate)).toString() + '$'
-                           }
-                         ]
-                       }
-                  }, */{
-						"type" : "web_url",
-						"url"  : data.items[i].productUrl,
-						"title": "Show Item",
-						"webview_height_ratio" : "tall"
-					 }, 
-					 {
-						"type": "web_url",
-						"url": data.items[i].addToCartUrl, 
-						"title": "Add to Cart",
-						"webview_height_ratio": "tall"
-					 }] 
-		          }
-				  i++;
+		card[i] =  new builder.HeroCard(session)
+		               .title(data.items[i].name)
+					   .subtitle(data.items[i].salePrice + '$')
+				       .images([
+					       builder.CardImage.create(session, data.items[i].thumbnailImage) 
+				       ])
+				       .buttons([
+					       builder.CardAction.postBack(session, "Show item" + (data.items[i].itemId).toString(),"Show item"),
+						  // builder.CardAction.openUrl(session, data.items[i].addToCartUrl, "Add to Cart"),
+				       ])
+				       .tap(builder.CardAction.openUrl(session, data.items[i].productUrl))
+				i++;
 				}
+		if(data.items[9] !== undefined){	
+		card[i] = new builder.HeroCard(session)
+                      .subtitle('Want to see Similar kind of shoes? Click below')
+                      .buttons([
+					       builder.CardAction.imBack(session, "Show more", "Show more"),
+				       ])
+		}
 		session.userData.colors = colorsArray(session, data);
 		session.userData.brands = brandsArray(session, data);
 		session.userData.sizes = sizesArray(session, data);
-    var message = new builder.Message(session)
-      .sourceEvent({
-        facebook: {
-           "attachment":{
-            "type":"template",			   
-            "payload": {
-				"template_type": "generic",
-				"elements": JSON.stringify(card, null, 4)
-			}
-		   }
-		}
-	  })
-	session.send(message);
-	if(data.items[9] !== undefined){	
-		var showmoreMsg = new builder.Message(session)
-            .attachments([
-                new builder.HeroCard(session)
-                    .title("Browse More")
-                    .subtitle("Want to see Similar kind of shoes? Click below")
-					.buttons([
-                        builder.CardAction.imBack(session, "Show more", "Show me More")
-                    ])
-                    ]);
-        session.send(showmoreMsg);
-	}
+		var msg = new builder.Message(session)
+				.attachmentLayout(builder.AttachmentLayout.carousel)
+				.attachments(card);
+				session.send(msg);
+	}			
 }
-}
+
 
 brandsArray = function(session,data){
     brands = [];	
@@ -376,9 +336,31 @@ dialog.matches('Size', function (session, args, results) {
 	})
 })
 
+dialog.matches('Show Item', function (session, args, results) {
+	console.log("in show item intent");
+	var itemId = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
+	session.userData.itemId = itemId ? itemId.entity : "";
+	session.userData.path = "v1/items/" + session.userData.itemid + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
+	callingApi(session.userData.path, function(data){	
+	showoutput(session,data);
+	session.endDialog();
+	}
+}
+
+dialog.matches('Add Cart', function (session, args, results) {
+	console.log("in add cart intent");
+	var itemId = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
+	session.userData.itemId = itemId ? itemId.entity : "";
+	session.userData.path = "v1/items/" + session.userData.itemid + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
+	callingApi(session.userData.path, function(data){	
+	showoutput(session,data);
+	session.endDialog();
+	}
+}
+	
 dialog.matches('Show more', function (session, args) {
 	session.userData.page += 1;
-	session.send("Sure, These are some more similar kind of shoes");
+	session.send("Of course, These are some more similar kind of shoes");
 	        if(session.userData.size == "any"){
 				if(session.userData.color == "any"){
 					session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:&format=json&start=" +session.userData.page+ "1&numItems=10";
@@ -413,12 +395,6 @@ dialog.matches('Greeting', function (session, args) {
 
 // Handling unrecognized conversations.
 dialog.matches('None', function (session, args) {
-	console.log ('in none intent');	
-	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");
-    session.endDialog();	
-});
-
-bot.dialog('None', function (session, args) {
 	console.log ('in none intent');	
 	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");
     session.endDialog();	
