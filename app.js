@@ -89,7 +89,10 @@ showoutput = function(session,data){
 		        	{
                         "type":"payment",
                         "title":"buy",
-                        "payload":"action?None",
+                        "payload": {
+				                   "template_type": "generic",
+				                   "elements": "")
+			                       },
                         "payment_summary":{
                         "currency":"USD",
                         "payment_type":"FIXED_AMOUNT",
