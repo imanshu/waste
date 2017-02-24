@@ -106,6 +106,17 @@ showItem = function(session, data){
 						   builder.CardAction.postBack(session, "Show more", "Show more"),
 						])
 				       ]);
+	sess.cart[sess.num] = { 
+		                    "title"    : data.items[i].name,
+					        "subtitle" : data.items[i].salePrice + '$',
+					        "image_url": data.items[i].thumbnailImage ,
+					        "buttons"  : [{
+						                   "type": "web_url",
+						                   "url": data.items[i].addToCartUrl, 
+						                   "title": "Remove",
+						                   "webview_height_ratio": "tall"
+					                     }] 
+		                  }
 	session.send(item);
 }
 
