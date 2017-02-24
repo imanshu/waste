@@ -77,15 +77,18 @@ capitalize = function(str) {
 }
 
 addCart = function(session, data){	
-	sess.cart[sess.num] =   {      "title"    : data.name,
-				                      "subtitle" : data.salePrice + '$',
-					                  "image_url": data.thumbnailImage ,
-					                  "buttons"  : [{
-					                                   "type":"postback",
-                                                       "title":"Remove",
-                                                       "payload":"removeitem " + i
-					                               }]
-	                           }  
+	sess.cart[sess.num] =new builder.Message(session)
+				         .attachments([
+				         new builder.HeroCard(session)
+		                       .title(data.name)
+				        	   .subtitle(data.salePrice + '$')
+				               .images([
+					                    builder.CardImage.create(session, data.thumbnailImage) 
+				                       ])
+				              .buttons([
+					                    builder.CardAction.postBack(session, "remove item "+ i +" to cart","Add to Cart")
+						              ])
+				          ]);
 	sess.num +=1;
 	session.send("item added to cart");
 }
