@@ -1,9 +1,6 @@
 var restify = require('restify');
 var builder = require('botbuilder');
 var http = require('http');
-var sess = require('client-sessions');
-sess.cart = [];
-sess.num = 0;
 
 var FRONTEND_URL = 'https://helloworldbot12.azurewebsites.net' || 'https://localhost:5000';
 
@@ -76,7 +73,7 @@ capitalize = function(str) {
 }
 
 addCart = function(session, data){	
-	sess.cart[sess.num] = { 
+	session.userData.cart[session.userData.num] = { 
 		                    "title"    : data.items[i].name,
 					        "subtitle" : data.items[i].salePrice + '$',
 					        "image_url": data.items[i].thumbnailImage ,
@@ -87,7 +84,7 @@ addCart = function(session, data){
 						                   "webview_height_ratio": "tall"
 					                     }] 
 		                  }
-	sess.num += 1;
+	session.userData.num += 1;
 	session.send("item added to cart");
 }
 
@@ -106,17 +103,6 @@ showItem = function(session, data){
 						   builder.CardAction.postBack(session, "Show more", "Show more"),
 						])
 				       ]);
-	sess.cart[sess.num] = { 
-		                    "title"    : data.items[i].name,
-					        "subtitle" : data.items[i].salePrice + '$',
-					        "image_url": data.items[i].thumbnailImage ,
-					        "buttons"  : [{
-						                   "type": "web_url",
-						                   "url": data.items[i].addToCartUrl, 
-						                   "title": "Remove",
-						                   "webview_height_ratio": "tall"
-					                     }] 
-		                  }
 	session.send(item);
 }
 
@@ -275,7 +261,6 @@ dialog.matches('ShoeSearch' ,
 	if(session.userData.brand=="puma"){session.userData.brand = "PUMA";}
     removeSpace(session.userData.brand);
 	session.userData.page = 0;
-	session.userData.lines = "";
 	if(session.userData.gender == ''){
 		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query="+ session.userData.type+ "shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	}else{
@@ -400,7 +385,7 @@ var message = new builder.Message(session)
             "type":"template",			   
             "payload": {
 				"template_type": "list",
-				"elements": JSON.stringify(sess.cart, null, 4)
+				"elements": JSON.stringify(session.userData.cart, null, 4)
 			}
 		   }
 		}
@@ -450,6 +435,8 @@ dialog.matches('Show more', function (session, args) {
 
 // Handling Greeting intent.
 dialog.matches('Greeting', function (session, args) {
+	session.userData.cart = [];
+	session.userData.num = [];
 	console.log ('in greeting intent');	
 	session.send("Greetings, Welcome to the Walmart Digital Shoe Bot!!");
     session.send("What are you looking for today?");
