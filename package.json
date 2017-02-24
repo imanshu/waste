@@ -22,6 +22,7 @@
   "homepage": "https://github.com/Tirumalesh12/NodeMSbot#readme",
   "dependencies": {
     "botbuilder": "^3.6.0",
+    "client-sessions": "^0.7.0",
     "http": "0.0.0",
     "restify": "^4.3.0"
   },
