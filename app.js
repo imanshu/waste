@@ -1,6 +1,10 @@
 var restify = require('restify');
 var builder = require('botbuilder');
 var http = require('http');
+var fs = require("fs");
+var sess = require("client-sessions");
+var sess.cart = [];
+var sess.num = 0;
 
 var FRONTEND_URL = 'https://helloworldbot12.azurewebsites.net' || 'https://localhost:5000';
 
@@ -72,20 +76,35 @@ capitalize = function(str) {
 	return str;
 }
 
+addCart = function(session, data){	
+	sess.cart[sess.num] =   {      "title"    : data.name,
+				                      "subtitle" : data.salePrice + '$',
+					                  "image_url": data.thumbnailImage ,
+					                  "buttons"  : [{
+					                                   "type":"postback",
+                                                       "title":"Remove",
+                                                       "payload":"removeitem " + i
+					                               }]
+	                           }  
+	sess.num +=1;
+	session.send("item added to cart");
+}
+
 showItem = function(session, data){
 	session.send("Sure, Have a look");
-	card =  new builder.HeroCard(session)
+	var item = new builder.Message(session)
+				.attachments([
+				new builder.HeroCard(session)
 		               .title(data.name)
 					   .subtitle(data.salePrice + '$')
 				       .images([
 					       builder.CardImage.create(session, data.thumbnailImage) 
-				       ])
+				         ])
 				       .buttons([
-					       builder.CardAction.postBack(session, "add item" +(data.items[i].itemId).toString() + "to cart","ADD to Cart"),
+					       builder.CardAction.postBack(session, "add item "+ parseInt(data.itemId) +" to cart","Add to Cart"),
 						   builder.CardAction.postBack(session, "Show more", "Show more"),
-				       ])
-	var item = new builder.Message(session)
-				.attachments(card);
+						])
+				       ]);
 	session.send(item);
 }
 
@@ -105,10 +124,8 @@ showoutput = function(session,data){
 					       builder.CardImage.create(session, data.items[i].thumbnailImage) 
 				       ])
 				       .buttons([
-					       builder.CardAction.postBack(session, "Show item" + (data.items[i].itemId).toString(),"Show item"),
-						  // builder.CardAction.openUrl(session, data.items[i].addToCartUrl, "Add to Cart"),
+					       builder.CardAction.postBack(session, "showitem  "+ parseInt(data.items[i].itemId),"Show item"),
 				       ])
-				       .tap(builder.CardAction.openUrl(session, data.items[i].productUrl))
 				i++;
 				}
 		if(data.items[9] !== undefined){	
@@ -246,11 +263,13 @@ dialog.matches('ShoeSearch' ,
 	if(session.userData.brand=="puma"){session.userData.brand = "PUMA";}
     removeSpace(session.userData.brand);
 	session.userData.page = 0;
+	session.userData.lines = "";
 	if(session.userData.gender == ''){
 		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query="+ session.userData.type+ "shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	}else{
 	    session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	}
+	
 	//session.send('Hello there! I am the shoe search bot. You are looking for %s %s %s %s for %s of size %s',session.userData.brand,session.userData.type,session.userData.color,session.userData.shoe,session.userData.gender,session.userData.size);		
 	callingApi(session.userData.path, function(data){	
 		showoutput(session,data);
@@ -340,23 +359,54 @@ dialog.matches('Show Item', function (session, args, results) {
 	console.log("in show item intent");
 	var itemId = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	session.userData.itemId = itemId ? itemId.entity : "";
-	session.userData.path = "v1/items/" + session.userData.itemid + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
+	session.userData.path = "/v1/items/" + session.userData.itemId + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
 	callingApi(session.userData.path, function(data){	
-	showoutput(session,data);
+	showItem(session,data);
 	session.endDialog();
-	}
-}
+	})
+})
 
 dialog.matches('Add Cart', function (session, args, results) {
 	console.log("in add cart intent");
 	var itemId = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	session.userData.itemId = itemId ? itemId.entity : "";
-	session.userData.path = "v1/items/" + session.userData.itemid + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
+	session.userData.path = "/v1/items/" + session.userData.itemId + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
 	callingApi(session.userData.path, function(data){	
-	showoutput(session,data);
+	addCart(session,data);
+	builder.Prompts.choice(session, "Check your cart",['Showcart']);
 	session.endDialog();
+	})
+})
+
+dialog.matches('Show Cart', function (session, args, results) {
+	console.log("in show cart intent");
+var message = new builder.Message(session)
+      .sourceEvent({
+        facebook: {
+           "attachment":{
+            "type":"template",			   
+            "payload": {
+				"template_type": "list",
+				"elements": JSON.stringify(sess.cart, null, 4)
+			}
+		   }
+		}
+	  })
+	session.send(message);
+	session.endDialog();
+})
+
+dialog.matches('Remove Cart', function (session, args, results) {
+	console.log("in remove item cart intent");
+	var num = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
+	var arrayNum = num ? num.entity : "";
+	if(sess.cart[0] == null){
+		session.send("No item in your cart");
+	}else{
+		sess.cart.splice(arrayNum,1);
 	}
-}
+	session.endDialog();
+})
 	
 dialog.matches('Show more', function (session, args) {
 	session.userData.page += 1;
@@ -432,22 +482,18 @@ server.listen(process.env.port || 5000, function () {
 server.get('/authorize', restify.queryParser(), function (req, res, next) {
   if (req.query && req.query.redirect_uri && req.query.username) {
     var username = req.query.username;
-
     // Here, it would be possible to take username (and perhaps password and other data)
     // and do some verifications with a backend system. The authorization_code query string
     // argument is an arbitrary pass-through value that could be stored as well
     // to enable verifying it once Facebook sends the `Account Linking webhook event`
     // that we handle below. In this case, we are passing the username via the authorization_code
     // since that avoids a need for an external databases in this simple scenario.
-
     var redirectUri = req.query.redirect_uri + '&authorization_code=' + username;
     return res.redirect(redirectUri, next);
   } else {
     return res.send(400, 'Request did not contain redirect_uri and username in the query string');
   }
 });
-
 */
 server.get(/\/static\/?.*/, restify.serveStatic({
   directory: __dirname
-}));
