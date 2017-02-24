@@ -77,18 +77,17 @@ capitalize = function(str) {
 }
 
 addCart = function(session, data){	
-	sess.cart[sess.num] =new builder.Message(session)
-				         .attachments([
-				         new builder.HeroCard(session)
-		                       .title(data.name)
-				        	   .subtitle(data.salePrice + '$')
-				               .images([
-					                    builder.CardImage.create(session, data.thumbnailImage) 
-				                       ])
-				              .buttons([
-					                    builder.CardAction.postBack(session, "remove item "+ i +" to cart","Add to Cart")
-						              ])
-				          ]);
+	sess.cart[sess.num] = { 
+		                    "title"    : data.items[i].name,
+					        "subtitle" : data.items[i].salePrice + '$',
+					        "image_url": data.items[i].thumbnailImage ,
+					        "buttons"  : [{
+						                   "type": "web_url",
+						                   "url": data.items[i].addToCartUrl, 
+						                   "title": "Remove",
+						                   "webview_height_ratio": "tall"
+					                     }] 
+		                  }
 	sess.num +=1;
 	session.send("item added to cart");
 }
@@ -371,6 +370,7 @@ dialog.matches('Show Item', function (session, args, results) {
 
 dialog.matches('Add Cart', function (session, args, results) {
 	console.log("in add cart intent");
+	session.send("in add cart intent");
 	var itemId = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	session.userData.itemId = itemId ? itemId.entity : "";
 	session.userData.path = "/v1/items/" + session.userData.itemId + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
