@@ -103,7 +103,7 @@ showItem = function(session, data){
 					       builder.CardImage.create(session, data.thumbnailImage) 
 				         ])
 				       .buttons([
-					       builder.CardAction.postBack(session, "add item "+ parseInt(data.itemId) +" to cart","Add to Cart"),
+					       builder.CardAction.postBack(session, "additem "+ parseInt(data.itemId) +" to cart","Add to Cart"),
 						   builder.CardAction.postBack(session, "Show more", "Show more"),
 						])
 				       ]);
