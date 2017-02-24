@@ -1,8 +1,7 @@
 var restify = require('restify');
 var builder = require('botbuilder');
 var http = require('http');
-var fs = require("fs");
-var sess = require("client-sessions");
+var sess = require('client-sessions');
 sess.cart = [];
 sess.num = 0;
 
@@ -88,7 +87,7 @@ addCart = function(session, data){
 						                   "webview_height_ratio": "tall"
 					                     }] 
 		                  }
-	sess.num +=1;
+	sess.num += 1;
 	session.send("item added to cart");
 }
 
