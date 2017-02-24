@@ -438,7 +438,7 @@ dialog.matches('Greeting', function (session, args) {
 	session.userData.cart = [];
 	session.userData.num = 0;
 	console.log ('in greeting intent');	
-	session.send("Greetings, Welcome to the Walmart Digital Shoe Bot!!");
+	session.send("Greetings, Welcome to the Walmart Digital Shoe Bot!!!");
     session.send("What are you looking for today?");
 	session.endDialog();
 });
