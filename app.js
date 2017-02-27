@@ -93,11 +93,24 @@ showItem = function(session, data){
 	var item = new builder.Message(session)
 				.attachments([
 				new builder.HeroCard(session)
+				 .images([
+					      builder.CardImage.create(session, data.imageEntities[0].largeImage),
+				         ]),
+				new builder.HeroCard(session)
+				 .images([
+					      builder.CardImage.create(session, data.imageEntities[1].largeImage),
+				         ]),
+				new builder.HeroCard(session)
+				 .images([
+					      builder.CardImage.create(session, data.imageEntities[2].largeImage),
+				         ]),
+				new builder.HeroCard(session)
+				 .images([
+					      builder.CardImage.create(session, data.imageEntities[3].largeImage),
+				         ]),
+				new builder.HeroCard(session)
 		               .title(data.name)
 					   .subtitle(data.salePrice + '$' )
-				       .images([
-					      builder.CardImage.create(session, data.largeImage),
-				         ])
 				       .buttons([
 					       builder.CardAction.postBack(session, "additem "+ parseInt(data.itemId) +" to cart","Add to Cart"),
 						   builder.CardAction.postBack(session, "Show more", "Show more"),
