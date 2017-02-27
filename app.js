@@ -90,12 +90,13 @@ addCart = function(session, data){
 
 showItem = function(session, data){
 	var i = 0;
+	var card = [];
 	session.send("Sure, Have a look here");
 	while(i<4){
 		card[i] = new builder.HeroCard(session)
 				 .images([
 					      builder.CardImage.create(session, data.imageEntities[i].mediumImage),
-				         ]),
+				         ])
 				i++;
 				}
 		card[i] = new builder.HeroCard(session)
