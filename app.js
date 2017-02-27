@@ -94,12 +94,9 @@ showItem = function(session, data){
 				.attachments([
 				new builder.HeroCard(session)
 		               .title(data.name)
-					   .subtitle(data.salePrice + '$')
+					   .subtitle(data.salePrice + '$' )
 				       .images([
-					      builder.CardImage.create(session, data.imageEntities[0].thumbnailImage),
-						  builder.CardImage.create(session, data.imageEntities[1].thumbnailImage),
-						  builder.CardImage.create(session, data.imageEntities[2].thumbnailImage),
-						  builder.CardImage.create(session, data.imageEntities[3].thumbnailImage),
+					      builder.CardImage.create(session, data.largeImage),
 				         ])
 				       .buttons([
 					       builder.CardAction.postBack(session, "additem "+ parseInt(data.itemId) +" to cart","Add to Cart"),
