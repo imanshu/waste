@@ -89,7 +89,7 @@ addCart = function(session, data){
 }
 
 showItem = function(session, data){
-	session.send("Sure, Have a look");
+	session.send("Sure, Have a look here");
 	var item = new builder.Message(session)
 				.attachments([
 				new builder.HeroCard(session)
