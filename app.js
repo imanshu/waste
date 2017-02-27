@@ -1,6 +1,9 @@
 var restify = require('restify');
 var builder = require('botbuilder');
 var http = require('http');
+var sess = require('client-sessions')
+sess.maincart = [];
+sess.number = 0;
 
 var FRONTEND_URL = 'https://helloworldbot12.azurewebsites.net' || 'https://localhost:5000';
 
@@ -73,18 +76,15 @@ capitalize = function(str) {
 }
 
 addCart = function(session, data){	
-	session.userData.cart[session.userData.num] = { 
-		                    "title"    : data.items[i].name,
-					        "subtitle" : data.items[i].salePrice + '$',
-					        "image_url": data.items[i].thumbnailImage ,
-					        "buttons"  : [{
-						                   "type": "web_url",
-						                   "url": data.items[i].addToCartUrl, 
-						                   "title": "Remove",
-						                   "webview_height_ratio": "tall"
-					                     }] 
-		                  }
-	session.userData.num += 1;
+	sess.maincart[sess.number] = { "title"    : data.name,
+					"subtitle" : data.salePrice + '$',
+					"image_url": data.thumbnailImage ,
+	               }
+				   console.log(sess.number);
+	console.log(sess.maincart);
+  	session.userData.cartItem = sess.maincart;
+	sess.number += 1;
+	
 	session.send("item added to cart");
 }
 
@@ -96,7 +96,10 @@ showItem = function(session, data){
 		               .title(data.name)
 					   .subtitle(data.salePrice + '$')
 				       .images([
-					       builder.CardImage.create(session, data.thumbnailImage) 
+					      builder.CardImage.create(session, data.imageEntities[0].thumbnailImage),
+						  builder.CardImage.create(session, data.imageEntities[1].thumbnailImage),
+						  builder.CardImage.create(session, data.imageEntities[2].thumbnailImage),
+						  builder.CardImage.create(session, data.imageEntities[3].thumbnailImage),
 				         ])
 				       .buttons([
 					       builder.CardAction.postBack(session, "additem "+ parseInt(data.itemId) +" to cart","Add to Cart"),
@@ -228,8 +231,7 @@ var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
 bot.dialog('/', dialog);
 
 // Handling the Greeting intent. 
-dialog.matches('ShoeSearch' , 
-    function (session, args, next) {
+dialog.matches('ShoeSearch', function (session, args, next) {
 	console.log ('in shoesearch intent ');
 	var shoe = builder.EntityRecognizer.findEntity(args.entities, 'Shoe');
 	var gender = builder.EntityRecognizer.findEntity(args.entities, 'Gender');
@@ -244,11 +246,7 @@ dialog.matches('ShoeSearch' ,
 		color: color ? capitalize(color.entity) : "",
 		type: type ? capitalize(type.entity) : "",
 		size: size ? size.entity : "",
-		path: "",
-		brands: [],
-		colors: [],
-		sizes: []
-	};
+    };
 	if(session.userData.brand=="nike"){ session.userData.brand = "Nike"; }
 	if(session.userData.brand=="puma"){session.userData.brand = "PUMA";}
 	if(session.userData.brand=="reebok"){session.userData.brand = "Reebok";}
@@ -370,26 +368,26 @@ dialog.matches('Add Cart', function (session, args, results) {
 	session.userData.itemId = itemId ? itemId.entity : "";
 	session.userData.path = "/v1/items/" + session.userData.itemId + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
 	callingApi(session.userData.path, function(data){	
-	addCart(session,data);
-	builder.Prompts.choice(session, "Check your cart",['Showcart']);
+    addCart(session,data);
+	builder.Prompts.choice(session, "Check your cart",['showcart']);
 	session.endDialog();
 	})
 })
 
 dialog.matches('Show Cart', function (session, args, results) {
 	console.log("in show cart intent");
+	session.send("in show cart intent");
+	console.log(JSON.stringify(sess.maincart, null, 4));
 var message = new builder.Message(session)
-      .sourceEvent({
-        facebook: {
-           "attachment":{
-            "type":"template",			   
-            "payload": {
-				"template_type": "list",
-				"elements": JSON.stringify(session.userData.cart, null, 4)
-			}
-		   }
-		}
-	  })
+              .sourceEvent({
+                "attachment":{
+                   "type":"template",
+                      "payload":{
+                         "template_type":"generic",
+                       "elements":JSON.stringify(sess.maincart, null, 4)
+					  }
+				}
+			  })				
 	session.send(message);
 	session.endDialog();
 })
@@ -398,11 +396,14 @@ dialog.matches('Remove Cart', function (session, args, results) {
 	console.log("in remove item cart intent");
 	var num = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	var arrayNum = num ? num.entity : "";
-	if(sess.cart[0] == null){
+	if(session.userData.cartItem[0] == null){
 		session.send("No item in your cart");
 	}else{
-		sess.cart.splice(arrayNum,1);
+		session.userData.cartItem.splice(arrayNum,1);
+		sess.maincart.splice(arrayNum,1);
 	}
+	session.send("Item removed");
+	builder.Prompts.choice(session, "Check our cart.",['showcart']);
 	session.endDialog();
 })
 	
@@ -435,11 +436,23 @@ dialog.matches('Show more', function (session, args) {
 
 // Handling Greeting intent.
 dialog.matches('Greeting', function (session, args) {
-	session.userData.cart = [];
-	session.userData.num = 0;
 	console.log ('in greeting intent');	
 	session.send("Greetings, Welcome to the Walmart Digital Shoe Bot!!!");
     session.send("What are you looking for today?");
+	session.userData = {
+		shoe:  "",
+		gender:"",
+		brand: "",
+		color: "",
+		type:  "",
+		size:  "",
+		path:  "",
+		num:   0,
+		brands: [],
+		colors: [],
+		sizes: [],
+		cartItem: []
+	};
 	session.endDialog();
 });
 
