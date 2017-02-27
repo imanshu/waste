@@ -383,6 +383,7 @@ dialog.matches('Show Cart', function (session, args, results) {
 	console.log(JSON.stringify(sess.maincart, null, 4));
 var message = new builder.Message(session)
               .sourceEvent({
+				facebook: {
                 "attachment":{
                    "type":"template",
                       "payload":{
@@ -390,6 +391,7 @@ var message = new builder.Message(session)
                        "elements":JSON.stringify(sess.maincart, null, 4)
 					  }
 				}
+			   }
 			  })				
 	session.send(message);
 	session.endDialog();
