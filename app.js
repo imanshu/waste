@@ -77,8 +77,14 @@ capitalize = function(str) {
 
 addCart = function(session, data){	
 	sess.maincart[sess.number] = { "title"    : data.name,
-					"subtitle" : data.salePrice + '$',
-					"image_url": data.thumbnailImage ,
+					               "subtitle" : data.salePrice + '$',
+					               "image_url": data.thumbnailImage ,
+								   "buttons":[
+                                             {
+                                                "type":"web_url",
+                                                "url":"https://petersfancybrownhats.com",
+                                                "title":"View Website"
+                                             }]
 	               }
 				   console.log(sess.number);
 	console.log(sess.maincart);
