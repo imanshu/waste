@@ -404,7 +404,7 @@ dialog.matches('Show Cart', function (session, args, results) {
 				         }
 			          }
 			       })
-	    var mesaage2 = new builder.Message(session)
+	    var message2 = new builder.Message(session)
 		               .attachments([
 				        new builder.HeroCard(session)
 						  .buttons([
@@ -421,12 +421,13 @@ dialog.matches('Show Cart', function (session, args, results) {
                              "type":"template",
                              "payload":{
                                 "template_type":"list",
+								 "top_element_style": "compact",
                                 "elements":JSON.stringify(sess.maincart, null, 4),
 								"buttons": [
                                            {
                                                 "type":"web_url",
                                                 "url":"https://petersfancybrownhats.com",
-                                                "title":"Remove Item"
+                                                "title":"Buy All"
                                            }
                                 ]  
 					         }
