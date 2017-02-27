@@ -89,34 +89,26 @@ addCart = function(session, data){
 }
 
 showItem = function(session, data){
+	var i = 0;
 	session.send("Sure, Have a look here");
-	var item = new builder.Message(session)
-				.attachments([
-				new builder.HeroCard(session)
+	while(i<4){
+		card[i] = new builder.HeroCard(session)
 				 .images([
-					      builder.CardImage.create(session, data.imageEntities[0].largeImage),
+					      builder.CardImage.create(session, data.imageEntities[i].mediumImage),
 				         ]),
-				new builder.HeroCard(session)
-				 .images([
-					      builder.CardImage.create(session, data.imageEntities[1].largeImage),
-				         ]),
-				new builder.HeroCard(session)
-				 .images([
-					      builder.CardImage.create(session, data.imageEntities[2].largeImage),
-				         ]),
-				new builder.HeroCard(session)
-				 .images([
-					      builder.CardImage.create(session, data.imageEntities[3].largeImage),
-				         ]),
-				new builder.HeroCard(session)
+				i++;
+				}
+		card[i] = new builder.HeroCard(session)
 		               .title(data.name)
 					   .subtitle(data.salePrice + '$' )
 				       .buttons([
 					       builder.CardAction.postBack(session, "additem "+ parseInt(data.itemId) +" to cart","Add to Cart"),
 						   builder.CardAction.postBack(session, "Show more", "Show more"),
 						])
-				       ]);
-	session.send(item);
+	var msg = new builder.Message(session)
+				.attachmentLayout(builder.AttachmentLayout.carousel)
+				.attachments(card);
+    session.send(msg);
 }
 
 showoutput = function(session,data){
