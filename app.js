@@ -83,7 +83,7 @@ addCart = function(session, data){
                                              {
                                                 "type":"web_url",
                                                 "url":"https://petersfancybrownhats.com",
-                                                "title":"View Website"
+                                                "title":"Remove Item"
                                              }]
 	               }
 				   console.log(sess.number);
@@ -381,19 +381,60 @@ dialog.matches('Show Cart', function (session, args, results) {
 	console.log("in show cart intent");
 	session.send("in show cart intent");
 	console.log(JSON.stringify(sess.maincart, null, 4));
-var message = new builder.Message(session)
-              .sourceEvent({
-				facebook: {
-                "attachment":{
-                   "type":"template",
-                      "payload":{
-                         "template_type":"generic",
-                       "elements":JSON.stringify(sess.maincart, null, 4)
-					  }
-				}
-			   }
-			  })				
-	session.send(message);
+	if(sess.maincart.length == 0) { 
+		var message = new builder.Message(session)
+		             .attachments([
+				      new builder.HeroCard(session)
+		                 .title("Your shopping cart is empty")
+					     .buttons([
+					         builder.CardAction.postBack(session, "Hii","Continue shopping")
+						  ])
+					])
+     	session.send(message);					
+	}else if(sess.maincart.len == 1){
+		var message = new builder.Message(session)
+                      .sourceEvent({
+				        facebook: {
+                          "attachment":{
+                             "type":"template",
+                             "payload":{
+                                "template_type":"generic",
+                                "elements":JSON.stringify(sess.maincart, null, 4)
+					         }
+				         }
+			          }
+			       })
+	    var mesaage2 = new builder.Message(session)
+		               .attachments([
+				        new builder.HeroCard(session)
+						  .buttons([
+					         builder.CardAction.postBack(session, "Buy item","Buy this Item"),
+						   ])
+					   ])
+	    session.send(message);
+		session.send(message2);
+	}else {
+	    var message = new builder.Message(session)
+                      .sourceEvent({
+				        facebook: {
+                          "attachment":{
+                             "type":"template",
+                             "payload":{
+                                "template_type":"list",
+                                "elements":JSON.stringify(sess.maincart, null, 4),
+								"buttons": [
+                                           {
+                                                "type":"web_url",
+                                                "url":"https://petersfancybrownhats.com",
+                                                "title":"Remove Item"
+                                           }
+                                ]  
+					         }
+				         }
+			          }
+			       })
+		session.send(message);
+    }			  
 	session.endDialog();
 })
 
