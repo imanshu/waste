@@ -381,6 +381,7 @@ dialog.matches('Show Cart', function (session, args, results) {
 	console.log("in show cart intent");
 	session.send("in show cart intent");
 	console.log(JSON.stringify(sess.maincart, null, 4));
+	console.log(JSON.stringify(session.userData.cartItem, null, 4));
 	if(sess.maincart.length == 0) { 
 		var message = new builder.Message(session)
 		             .attachments([
@@ -453,6 +454,10 @@ dialog.matches('Remove Cart', function (session, args, results) {
 	builder.Prompts.choice(session, "Check our cart.",['showcart']);
 	session.endDialog();
 })
+	
+dialog.matches('Buy', function (session, args, results) {
+	
+}
 	
 dialog.matches('Show more', function (session, args) {
 	session.userData.page += 1;
