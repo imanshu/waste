@@ -76,18 +76,17 @@ capitalize = function(str) {
 }
 
 addCart = function(session, data){	
+    session.userData.remove = sess.number + "removeitem" ;
 	sess.maincart[sess.number] = { "title"    : data.name,
 					               "subtitle" : data.salePrice + '$',
 					               "image_url": data.thumbnailImage ,
 								   "buttons":[
                                              {
-                                                "type":"web_url",
-                                                "url":"https://petersfancybrownhats.com",
-                                                "title":"Remove Item"
-                                             }]
+                                                "type":"postback",
+												"payload": data.salePrice + "removeitem",
+                                                "title":"Remove item"
+                                             }  ]
 	               }
-				   console.log(sess.number);
-	console.log(sess.maincart);
   	session.userData.cartItem = sess.maincart;
 	sess.number += 1;
 	
@@ -148,7 +147,6 @@ showoutput = function(session,data){
 				session.send(msg);
 	}			
 }
-
 
 brandsArray = function(session,data){
     brands = [];	
@@ -229,7 +227,7 @@ callingApi = function(path, callback){
 // Create bot and add dialogs
 var connector = new builder.ChatConnector({appId:"c60ece39-e97b-4f50-ae77-d0ac24f07a4f", appPassword:"tYQdi0sEppKbFwaFUOOKbJ4"});
 var bot = new builder.UniversalBot(connector);
-var recognizer = new builder.LuisRecognizer('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/ab8bc42f-9e84-4cf5-96e7-c59a54e552b6?subscription-key=412111898d6f49a0b22467676f123ecb&verbose=true&q=');
+var recognizer = new builder.LuisRecognizer('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/42a438e9-722e-4f2b-933b-02f3f862f57c?subscription-key=ef7d814726e342358583d833f37aaf9a&verbose=true&q=');
 var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
 bot.dialog('/', dialog);
 
@@ -260,6 +258,13 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 	if((session.userData.brand=="danskin")||(session.userData.brand== "now")){session.userData.brand = "Danskin Now";}
 	if((session.userData.brand=="new")||(session.userData.brand=="balance")){session.userData.brand = "New Balance";}
 	if(session.userData.brand=="puma"){session.userData.brand = "PUMA";}
+	if(session.userData.cartItem !== undefined){
+	sess.maincart = session.userData.cartItem;
+	sess.number = session.userData.cartItem.length;
+	}
+	if(session.userData.cartItem === undefined){
+	session.userData.cartItem = sess.maincart;
+	}
     removeSpace(session.userData.brand);
 	session.userData.page = 0;
 	if(session.userData.gender == ''){
@@ -295,7 +300,6 @@ dialog.matches('Gender', function (session, args) {
 	}
 	})
 })
-
 
 dialog.matches('Type', function (session, args) {
 	var type = builder.EntityRecognizer.findEntity(args.entities, 'Shoe::Shoe_type');
@@ -360,6 +364,10 @@ dialog.matches('Show Item', function (session, args, results) {
 	session.userData.path = "/v1/items/" + session.userData.itemId + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
 	callingApi(session.userData.path, function(data){	
 	showItem(session,data);
+	if(session.userData.cartItem !== undefined){
+	sess.maincart = session.userData.cartItem ;
+	sess.number = session.userData.cartItem.length;
+	}
 	session.endDialog();
 	})
 })
@@ -380,9 +388,25 @@ dialog.matches('Add Cart', function (session, args, results) {
 dialog.matches('Show Cart', function (session, args, results) {
 	console.log("in show cart intent");
 	session.send("in show cart intent");
-	console.log(JSON.stringify(sess.maincart, null, 4));
-	console.log(JSON.stringify(session.userData.cartItem, null, 4));
-	if(sess.maincart.length == 0) { 
+	if(session.userData.cartItem.length === 0){
+		session.userData.cartItem = sess.maincart;
+	}
+	var tax = 0, total = 0, shipping = 0, subtotal = 0, i = 0;
+	var str = "";
+	while(session.userData.cartItem){
+		str = session.usertData.cartItem[i].subtitle;
+		str = str.substring(0, str.length-1);
+		subtotal += parseInt(str);
+	}
+	if(subtotal <= 35){
+		shipping = 5.99;
+	}
+	tax = (0.085 * subtotal);
+	total = (subtotal+tax+shipping);
+	session.userData.cartItem[session.userData.cartItem.length] = { "title"    : "Total: " +total.toString()+ "$",
+					                                                "subtitle" : "subtotal: " +subtotal.toString()+ "$ /r/n shipping: " +shipping.toString()+ "$ /r/n tax: " +tax.toString()+ "$",
+	                                                              }
+	if(session.userData.cartItem.length == 1) { 
 		var message = new builder.Message(session)
 		             .attachments([
 				      new builder.HeroCard(session)
@@ -392,7 +416,7 @@ dialog.matches('Show Cart', function (session, args, results) {
 						  ])
 					])
      	session.send(message);					
-	}else if(sess.maincart.len == 1){
+	}else if(session.userData.cartItem.length == 2){
 		var message = new builder.Message(session)
                       .sourceEvent({
 				        facebook: {
@@ -400,7 +424,7 @@ dialog.matches('Show Cart', function (session, args, results) {
                              "type":"template",
                              "payload":{
                                 "template_type":"generic",
-                                "elements":JSON.stringify(sess.maincart, null, 4)
+                                "elements":JSON.stringify(session.userData.cartItem, null, 4)
 					         }
 				         }
 			          }
@@ -408,6 +432,7 @@ dialog.matches('Show Cart', function (session, args, results) {
 	    var message2 = new builder.Message(session)
 		               .attachments([
 				        new builder.HeroCard(session)
+						  .subtitle("Click on the buy button to buy thos item")
 						  .buttons([
 					         builder.CardAction.postBack(session, "Buy item","Buy this Item"),
 						   ])
@@ -423,41 +448,48 @@ dialog.matches('Show Cart', function (session, args, results) {
                              "payload":{
                                 "template_type":"list",
 								 "top_element_style": "compact",
-                                "elements":JSON.stringify(sess.maincart, null, 4),
+                                "elements":JSON.stringify(session.userData.cartItem, null, 4),
 								"buttons": [
-                                           {
-                                                "type":"web_url",
-                                                "url":"https://petersfancybrownhats.com",
-                                                "title":"Buy All"
-                                           }
+                                               {
+                                                "type":"postback",
+                                                "title":"Buy all",
+                                                "payload":"Buy all"
+                                             } 
                                 ]  
 					         }
 				         }
 			          }
 			       })
 		session.send(message);
-    }			  
+    }
+    session.userData.cartItem.splice(-1,1);	
 	session.endDialog();
 })
 
 dialog.matches('Remove Cart', function (session, args, results) {
 	console.log("in remove item cart intent");
+	session.send("in remove cart intent");
 	var num = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	var arrayNum = num ? num.entity : "";
+	var i = 0;
 	if(session.userData.cartItem[0] == null){
 		session.send("No item in your cart");
 	}else{
-		session.userData.cartItem.splice(arrayNum,1);
-		sess.maincart.splice(arrayNum,1);
+        while(session.userData.cartItem){
+			if(session.userData.cartItem[i].subtitle == (arrayNum+'$')){
+				console.log("iffff");
+				session.userData.cartItem.splice(i,1);
+				sess.maincart.splice(i,1);
+				sess.number -= 1;
+				session.send("Item removed");
+	            builder.Prompts.choice(session, "Check our cart.",['showcart']);
+				break;
+			}
+			i++;
+		}
 	}
-	session.send("Item removed");
-	builder.Prompts.choice(session, "Check our cart.",['showcart']);
 	session.endDialog();
 })
-	
-dialog.matches('Buy', function (session, args, results) {
-	
-}
 	
 dialog.matches('Show more', function (session, args) {
 	session.userData.page += 1;
@@ -489,6 +521,10 @@ dialog.matches('Show more', function (session, args) {
 // Handling Greeting intent.
 dialog.matches('Greeting', function (session, args) {
 	console.log ('in greeting intent');	
+	if(session.userData.cartItem !== undefined){
+	sess.maincart = session.userData.cartItem ;
+	sess.number = session.userData.cartItem.length;
+	}
 	session.send("Greetings, Welcome to the Walmart Digital Shoe Bot!!!");
     session.send("What are you looking for today?");
 	session.userData = {
