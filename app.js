@@ -397,29 +397,7 @@ dialog.matches('Show Cart', function (session, args, results) {
 	if(session.userData.cartItem.length === 0){
 		session.userData.cartItem = sess.maincart;
 	}
-	var tax = 0, total = 0, shipping = 0, subtotal = 0, i = 0;
-	var str = "";
-	while(session.userData.cartItem[i]){
-		str = session.userData.cartItem[i].subtitle;
-		str = str.substring(0, str.length-1);
-		subtotal += parseInt(str);
-		i++;
-	}
-	if(subtotal <= 35){
-		shipping = 5.99;
-	}
-	tax = (0.085 * subtotal);
-	total = (subtotal+tax+shipping);
-	session.userData = {
-		subtotal: subtotal,
-		shipping: shipping,
-		tax: tax,
-		total: total
-	}
-	session.userData.cartItem[session.userData.cartItem.length] = { "title"    : "Total: " +total.toString()+ "$",
-					                                                "subtitle" : "subtotal: " +subtotal.toString()+ "$ /r/n shipping: " +shipping.toString()+ "$ /r/n tax: " +tax.toString()+ "$",
-	                                                              }
-	if(session.userData.cartItem.length == 1) { 
+	if(session.userData.cartItem.length == 0) { 
 		var message = new builder.Message(session)
 		             .attachments([
 				      new builder.HeroCard(session)
@@ -429,8 +407,31 @@ dialog.matches('Show Cart', function (session, args, results) {
 						  ])
 					])
      	session.send(message);					
-	}else if(session.userData.cartItem.length == 2){
-		var message = new builder.Message(session)
+	}else {
+		var tax = 0, total = 0, shipping = 0, subtotal = 0, i = 0;
+		var str = "";
+		while(session.userData.cartItem[i]){
+			str = session.userData.cartItem[i].subtitle;
+			str = str.substring(0, str.length-1);
+			subtotal += parseInt(str);
+			i++;
+			}
+			if(subtotal <= 35){
+				shipping = 5.99;
+				}
+			tax = (0.085 * subtotal);
+			total = (subtotal+tax+shipping);
+			session.userData = {
+				subtotal: subtotal,
+				shipping: shipping,
+				tax: tax,
+				total: total
+				}
+				session.userData.cartItem[session.userData.cartItem.length] = { "title"    : "Total: " +total.toString()+ "$",
+					                                                            "subtitle" : "subtotal: " +subtotal.toString()+ "$ /r/n shipping: " +shipping.toString()+ "$ /r/n tax: " +tax.toString()+ "$",
+	                                                                              }
+			if(session.userData.cartItem.length == 2){
+				var message = new builder.Message(session)
                       .sourceEvent({
 				        facebook: {
                           "attachment":{
@@ -442,18 +443,18 @@ dialog.matches('Show Cart', function (session, args, results) {
 				         }
 			          }
 			       })
-	    var message2 = new builder.Message(session)
-		               .attachments([
+			var message2 = new builder.Message(session)
+		                .attachments([
 				        new builder.HeroCard(session)
-						  .subtitle("Click on the buy button to buy thos item")
-						  .buttons([
-					         builder.CardAction.postBack(session, "Check out","Check out"),
-						   ])
-					   ])
-	    session.send(message);
-		session.send(message2);
-	}else {
-	    var message = new builder.Message(session)
+						   .subtitle("Click on the buy button to buy thos item")
+						   .buttons([
+					          builder.CardAction.postBack(session, "Check out","Check out"),
+						    ])
+					    ])
+			session.send(message);
+			session.send(message2);
+			}else {
+				var message = new builder.Message(session)
                       .sourceEvent({
 				        facebook: {
                           "attachment":{
@@ -473,8 +474,9 @@ dialog.matches('Show Cart', function (session, args, results) {
 				         }
 			          }
 			       })
-		session.send(message);
-    }
+			    session.send(message);
+				}
+	}
     session.userData.cartItem.splice(-1,1);	
 	session.endDialog();
 })
