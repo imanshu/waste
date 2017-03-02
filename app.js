@@ -387,9 +387,8 @@ dialog.matches('Add Cart', function (session, args, results) {
 		addCart(session,data);
 		builder.Prompts.choice(session, "Check your cart",['showcart']);
 		session.endDialog();
-		}
+		})
 	}
-	})
 })
 
 dialog.matches('Show Cart', function (session, args, results) {
@@ -574,30 +573,29 @@ dialog.matches('Buy', [
 		console.log("in buy intent");
 		session.send(" Here is your profile details: \r\n \r\n Name: Mr. Stephane Crozatier \r\n Email: coolstephane@abc.xyz \r\n Contact: 9876543210");
 		builder.Prompts.choice(session, "Continue as Stephane",['Continue','Cancel']);
-	}
+	},
 	function(session, args, results){
 		 if (results.response && results.response.entity == 'Continue' ) {
 			 session.send("OK, we found two saved addresses");
 		     builder.Prompts.choice(session, "Please select one address",['Work address','Home address','Cancel']);
 		}else {}
-	}
+	},
 	function(session, args, results){
 		 if (results.response && results.response.entity != 'Cancel') {
 			 session.send("OK Stephane, we will ship it to your %s", results.response.entity);
 			 builder.Prompts.choice(session, "select shipping method",["Normal shipping(6-7 days) - normal shipping cost", "Fedex(nextday delivery)- extra $5", "USPS(2-3 days delivery)- extra $3",'Cancel']);
 		 }else {}
-	}
+	},
 	function(session, args, results){
 		if (results.response && results.response.entity != 'Cancel') {
 		builder.Prompts.choice(session, "Select card for payment",['VISA 1234','Cancel']);
 		}else {}
-	}
+	},
 	function(session, args, results){
 		if (results.response && results.response.entity != 'Cancel') {
 		builder.Prompts.number(session, "Give security number of your card VISA 1234");
 		}else {}
 	}
-	
 ])
 
 // Handling the Brand dialog. 
