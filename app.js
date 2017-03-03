@@ -601,6 +601,7 @@ dialog.matches('Buy', [
                           }
 				i++;
 			}
+		var timeStamp = Math.floor(Date.now() / 1000);
 		session.send("Payment successfull!!");
 		session.send("Please check your reciept");
 		var msg = new builder.Message(session)
@@ -616,25 +617,8 @@ dialog.matches('Buy', [
         "payment_method":"Visa 1234", 
         "merchant_name": "Walmart",		
         "order_url":"http://petersapparel.parseapp.com/order?order_id=123456",
-        "timestamp":"1428444852", 
-        "elements":[
-          {
-            "title":"Classic White T-Shirt",
-            "subtitle":"100% Soft and Luxurious Cotton",
-            "quantity":2,
-            "price":50,
-            "currency":"USD",
-            "image_url":"http://petersapparel.parseapp.com/img/whiteshirt.png"
-          },
-          {
-            "title":"Classic Gray T-Shirt",
-            "subtitle":"100% Soft and Luxurious Cotton",
-            "quantity":1,
-            "price":25,
-            "currency":"USD",
-            "image_url":"http://petersapparel.parseapp.com/img/grayshirt.png"
-          }
-        ],
+        "timestamp":timeStamp, 
+        "elements": JSON.stringify(receipt, null, 4),
         "address":{
           "street_1":"1 Hacker Way",
           "street_2":"",
