@@ -606,24 +606,24 @@ dialog.matches('Buy', [
 		var time = Math.floor(Date.now() / 1000);
 		var timeStamp = time.toString();
 		var i = 0, j = 0;
-			var receipt= [];
-			var str = "";
-			var subtotal = [];
-		    while(session.userData.cartItem[j]){
+		var receipt= [];
+		var str = "";
+		var subtotal = [];
+		while(session.userData.cartItem[j]){
 			str = session.userData.cartItem[j].subtitle;
 			str = str.substring(0, str.length-1);
 			subtotal[j] = parseFloat(str).toFixed(2);
 			j++;
 			}
-			while(session.userData.cartItem[i]){
-				receipt[i] = {
+		while(session.userData.cartItem[i]){
+			receipt[i] = {
                             "title": session.userData.cartItem[i].title,
                             "quantity":1,
                             "price": subtotal[i],
                             "currency": "USD",
                             "image_url":session.userData.cartItem[i].image_url
                           }
-				i++;
+			i++;
 			}
 		session.send("Payment successfull!!");
 		session.send("Please check your reciept");
@@ -631,47 +631,48 @@ dialog.matches('Buy', [
             .sourceEvent({
                 facebook: {
 					"attachment":{
-      "type":"template",
-      "payload":{
-        "template_type":"receipt",
-        "recipient_name":"Stephane Crozatier",
-        "order_number":"12345678902",
-        "currency":"USD",
-        "payment_method":"Visa 1234", 
-        "merchant_name": "Walmart",		
-        "order_url":"http://petersapparel.parseapp.com/order?order_id=123456",
-        "timestamp": timeStamp, 
-        "elements": JSON.stringify(receipt, null, 4),
-        "address":{
-          "street_1":"1 Hacker Way",
-          "street_2":"",
-          "city":"Menlo Park",
-          "postal_code":"94025",
-          "state":"CA",
-          "country":"US"
-        },
-        "summary":{
-          "subtotal"      : session.userData.subtotal,
-          "shipping_cost" : session.userData.shipping,
-          "total_tax"     : session.userData.tax,
-          "total_cost"    : session.userData.total
-        },
-        "adjustments":[
-          {
-            "name":"New Customer Discount",
-            "amount":20
-          },
-          {
-            "name":"$10 Off Coupon",
-            "amount":10
-          }
-        ]
-      }
-    }
-	}
-			});
-        session.endDialog(msg);
-		session.endDialog();
+                      "type":"template",
+                      "payload":{
+                        "template_type":"receipt",
+                        "recipient_name":"Stephane Crozatier",
+                        "order_number":"12345678902",
+                        "currency":"USD",
+                        "payment_method":"Visa 1234", 
+                        "merchant_name": "Walmart",		
+                        "order_url":"http://petersapparel.parseapp.com/order?order_id=123456",
+                        "timestamp": timeStamp, 
+                        "elements": JSON.stringify(receipt, null, 4),
+                        "address":{
+                          "street_1":"1 Hacker Way",
+                          "street_2":"",
+                          "city":"Menlo Park",
+                          "postal_code":"94025",
+                          "state":"CA",
+                          "country":"US"
+                        },
+                        "summary":{
+                          "subtotal"      : session.userData.subtotal,
+                          "shipping_cost" : session.userData.shipping,
+                          "total_tax"     : session.userData.tax,
+                          "total_cost"    : session.userData.total
+                        },
+                        "adjustments":[
+                         {
+                            "name"  : "New Customer Discount",
+                            "amount": 20
+                         },
+                         {
+                            "name"  : "$10 Off Coupon",
+                            "amount": 10
+                         }
+					]
+				}
+			}
+		  }
+		});	
+		sess.maincart = [];
+		session.userData.cartItem = [];
+		session.endDialog(msg);
 		}
 	}
 ])
