@@ -406,20 +406,21 @@ dialog.matches('Show Cart', function (session, args, results) {
 					])
      	session.send(message);					
 	}else {
-		var tax = 0.0, total = 0.0, shipping = 0.0, subtotal = 0.0, i = 0;
+		var tax = 0.0, tax1 = 0.0,total = 0.0, shipping = 0.0, subtotal = 0.0, subtotal1 = 0.0, i = 0;
 		var str = "";
 		while(session.userData.cartItem[i]){
 			str = session.userData.cartItem[i].subtitle;
 			str = str.substring(0, str.length-1);
-			subtotal += parseFloat(str);
+			subtotal1 += parseFloat(str);
 			i++;
 			}
-			subtotal = parseFloat(subtotal).toFixed(2);
+			subtotal = parseFloat(subtotal1).toFixed(2);
 			if(subtotal <= 35){
 				shipping = 5.99;
 				}
+			tax1 = 0.085 * subtotal;
 			tax = parseFloat(0.085 * subtotal).toFixed(2);
-			total = parseFloat(subtotal+tax+shipping).toFixed(2);
+			total = parseFloat(subtotal1+tax1+shipping).toFixed(2);
 			session.userData = {
 				subtotal: subtotal,
 				shipping: shipping,
