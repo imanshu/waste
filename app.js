@@ -517,7 +517,7 @@ dialog.matches('Greeting', function (session, args) {
 	sess.number = session.userData.cartItem.length;
 	}
 	session.send("Greetings, Welcome to the Walmart Digital Shoe Bot!!!");
-    session.send("What are you looking for today?");
+    //session.send("What are you looking for today?");
 	session.userData = {
 		shoe:  "",
 		gender:"",
@@ -536,7 +536,21 @@ dialog.matches('Greeting', function (session, args) {
 		sizes: [],
 		cartItem: []
 	};
-	session.endDialog();
+	var msg = new builder.Message(session)
+            .attachments([
+                new builder.HeroCard(session)
+                    .title("Now shopping is Easy")
+                  //.subtitle("The Space Needle is an observation tower in Seattle, Washington, a landmark of the Pacific Northwest, and an icon of Seattle.")
+                    .images([
+                        builder.CardImage.create(session, "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDnxOiqHe_eeILFpHyrmOTBsMLxEqoEHoTo3eS8wCwU6ItKRNU")
+                       ])
+					.buttons([
+					       builder.CardAction.postBack(session, "Men shoes","Men shoes"),
+						   builder.CardAction.postBack(session, "Women shoes", "Women shoes"),
+						   builder.CardAction.postBack(session, "showcart", "Go to Cart"),
+						])
+					]);
+	session.endDialog(msg);
 });
 
 // Handling unrecognized conversations.
@@ -657,6 +671,7 @@ dialog.matches('Buy', [
 	}
 			});
         session.endDialog(msg);
+		session.endDialog();
 		}
 	}
 ])
