@@ -626,7 +626,7 @@ dialog.matches('Buy', [
         "payment_method":"Visa 1234", 
         "merchant_name": "Walmart",		
         "order_url":"http://petersapparel.parseapp.com/order?order_id=123456",
-        "timestamp":timeStamp, 
+        "timestamp": timeStamp, 
         "elements": [
           {
             "title":"Classic White T-Shirt",
@@ -635,6 +635,14 @@ dialog.matches('Buy', [
             "price":50,
             "currency":"USD",
             "image_url":"http://petersapparel.parseapp.com/img/whiteshirt.png"
+          },
+          {
+            "title":"Classic Gray T-Shirt",
+            "subtitle":"100% Soft and Luxurious Cotton",
+            "quantity":1,
+            "price":25,
+            "currency":"USD",
+            "image_url":"http://petersapparel.parseapp.com/img/grayshirt.png"
           }],
         "address":{
           "street_1":"1 Hacker Way",
