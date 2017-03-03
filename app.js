@@ -83,14 +83,14 @@ addCart = function(session, data){
 								   "buttons":[
                                              {
                                                 "type":"postback",
-												"payload": data.salePrice + "removeitem",
+												"payload": data.salePrice + " removeitem",
                                                 "title":"Remove item"
                                              }  ]
 	               }
   	session.userData.cartItem = sess.maincart;
 	sess.number += 1;
 	
-	session.send("item added to cart");
+	session.send("This item is been added to cart");
 }
 
 showItem = function(session, data){
@@ -374,18 +374,17 @@ dialog.matches('Show Item', function (session, args, results) {
 
 dialog.matches('Add Cart', function (session, args, results) {
 	console.log("in add cart intent");
-	session.send("in add cart intent");
 	var itemId = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	session.userData.itemId = itemId ? itemId.entity : "";
 	session.userData.path = "/v1/items/" + session.userData.itemId + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
-	if(session.userData.cartItem.length > 4){
-		session.send("Maximum 4 items can be added in cart once");
+	if(session.userData.cartItem.length > 3){
+		session.send("Maximum 3 items can be added in cart once");
 		builder.Prompts.choice(session, "Check your cart",['showcart']);
 		session.endDailog();
 	}else {
 		callingApi(session.userData.path, function(data){	
 		addCart(session,data);
-		builder.Prompts.choice(session, "Check your cart",['showcart']);
+		builder.Prompts.choice(session, "Select one option",['showcart','Continue Shopping']);
 		session.endDialog();
 		})
 	}
@@ -393,7 +392,6 @@ dialog.matches('Add Cart', function (session, args, results) {
 
 dialog.matches('Show Cart', function (session, args, results) {
 	console.log("in show cart intent");
-	session.send("in show cart intent");
 	if(session.userData.cartItem.length === 0){
 		session.userData.cartItem = sess.maincart;
 	}
@@ -408,52 +406,31 @@ dialog.matches('Show Cart', function (session, args, results) {
 					])
      	session.send(message);					
 	}else {
-		var tax = 0, total = 0, shipping = 0, subtotal = 0, i = 0;
+		var tax = 0.0, total = 0.0, shipping = 0.0, subtotal = 0.0, i = 0;
 		var str = "";
 		while(session.userData.cartItem[i]){
 			str = session.userData.cartItem[i].subtitle;
 			str = str.substring(0, str.length-1);
-			subtotal += parseInt(str);
+			subtotal += parseFloat(str);
 			i++;
 			}
+			subtotal = parseFloat(subtotal).toFixed(2);
 			if(subtotal <= 35){
 				shipping = 5.99;
 				}
-			tax = (0.085 * subtotal);
-			total = (subtotal+tax+shipping);
+			tax = parseFloat(0.085 * subtotal).toFixed(2);
+			total = parseFloat(subtotal+tax+shipping).toFixed(2);
 			session.userData = {
 				subtotal: subtotal,
 				shipping: shipping,
 				tax: tax,
 				total: total
 				}
-				session.userData.cartItem[session.userData.cartItem.length] = { "title"    : "Total: " +total.toString()+ "$",
-					                                                            "subtitle" : "subtotal: " +subtotal.toString()+ "$ /r/n shipping: " +shipping.toString()+ "$ /r/n tax: " +tax.toString()+ "$",
-	                                                                              }
-			if(session.userData.cartItem.length == 2){
-				var message = new builder.Message(session)
-                      .sourceEvent({
-				        facebook: {
-                          "attachment":{
-                             "type":"template",
-                             "payload":{
-                                "template_type":"generic",
-                                "elements":JSON.stringify(session.userData.cartItem, null, 4)
-					         }
-				         }
-			          }
-			       })
-			var message2 = new builder.Message(session)
-		                .attachments([
-				        new builder.HeroCard(session)
-						   .subtitle("Click on the buy button to buy thos item")
-						   .buttons([
-					          builder.CardAction.postBack(session, "Check out","Check out"),
-						    ])
-					    ])
-			session.send(message);
-			session.send(message2);
-			}else {
+			sess.maincart[sess.number] = { "title"    : "Total: " +total.toString()+ "$",
+					                       "subtitle" : "subtotal: " +subtotal.toString()+ "$ , shipping: " +shipping.toString()+ "$ , tax: " +tax.toString()+ "$",
+	                                      }
+            session.userData.cartItem = sess.maincart;
+			if(session.userData.cartItem.length < 5){
 				var message = new builder.Message(session)
                       .sourceEvent({
 				        facebook: {
@@ -483,7 +460,6 @@ dialog.matches('Show Cart', function (session, args, results) {
 
 dialog.matches('Remove Cart', function (session, args, results) {
 	console.log("in remove item cart intent");
-	session.send("in remove cart intent");
 	var num = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	var arrayNum = num ? num.entity : "";
 	var i = 0;
@@ -496,7 +472,7 @@ dialog.matches('Remove Cart', function (session, args, results) {
 				session.userData.cartItem.splice(i,1);
 				sess.maincart.splice(i,1);
 				sess.number -= 1;
-				session.send("Item removed");
+				session.send("Item removed from the cart");
 	            builder.Prompts.choice(session, "Check our cart.",['showcart']);
 				break;
 			}
@@ -551,10 +527,10 @@ dialog.matches('Greeting', function (session, args) {
 		size:  "",
 		path:  "",
 		num:   0,
-		subtotal: 0,
-		shipping: 0,
-		tax: 0,
-		total: 0,
+		subtotal: 0.0,
+		shipping: 0.0,
+		tax: 0.0,
+		total: 0.0,
 		brands: [],
 		colors: [],
 		sizes: [],
@@ -573,30 +549,121 @@ dialog.matches('None', function (session, args) {
 dialog.matches('Buy', [
     function(session, args){
 		console.log("in buy intent");
-		session.send(" Here is your profile details: \r\n \r\n Name: Mr. Stephane Crozatier \r\n Email: coolstephane@abc.xyz \r\n Contact: 9876543210");
+		session.send(" Here is your profile details: ");
+		session.send("Name: Mr. Stephane Crozatier");
+		session.send(" Email: coolstephane@abc.xyz ");
+		session.send("Contact: 9876543210");
 		builder.Prompts.choice(session, "Continue as Stephane",['Continue','Cancel']);
 	},
-	function(session, args, results){
-		 if (results.response && results.response.entity == 'Continue' ) {
+	function(session, results){
+		 if (results.response.entity != 'Cancel' ) {
 			 session.send("OK, we found two saved addresses");
 		     builder.Prompts.choice(session, "Please select one address",['Work address','Home address','Cancel']);
-		}else {}
+		}else {
+			session.endDialog();
+		}
 	},
-	function(session, args, results){
-		 if (results.response && results.response.entity != 'Cancel') {
+	function(session, results){
+		 if (results.response.entity != 'Cancel') {
 			 session.send("OK Stephane, we will ship it to your %s", results.response.entity);
 			 builder.Prompts.choice(session, "select shipping method",["Normal shipping(6-7 days) - normal shipping cost", "Fedex(nextday delivery)- extra $5", "USPS(2-3 days delivery)- extra $3",'Cancel']);
-		 }else {}
+		 }else {
+			session.endDialog();
+		}
 	},
-	function(session, args, results){
-		if (results.response && results.response.entity != 'Cancel') {
-		builder.Prompts.choice(session, "Select card for payment",['VISA 1234','Cancel']);
-		}else {}
+	function(session, results){
+		if (results.response.entity != 'Cancel') {
+			if(results.response.entity == "Fedex(nextday delivery)- extra $5"){session.userData.shipping += 5;}
+			if(results.response.entity == "USPS(2-3 days delivery)- extra $3"){session.userData.shipping += 3;}
+			builder.Prompts.choice(session, "Select card for payment",['VISA 1234','Cancel']);
+		}else {
+			session.endDialog();
+		}
 	},
-	function(session, args, results){
-		if (results.response && results.response.entity != 'Cancel') {
+	function(session, results){
+		if (results.response.entity != 'Cancel') {
 		builder.Prompts.number(session, "Give security number of your card VISA 1234");
-		}else {}
+		}else {
+			session.endDialog();
+		}
+	},
+	function(session, results){
+		if (results.response) {
+			var i = 0;
+			var receipt= [];
+			while(session.userData.cartItem[i]){
+				receipt[i] = {
+                            "title": session.userData.cartItem[i].title,
+                            "quantity":1,
+                            "price": session.userData.cartItem[i].subtitle,
+                            "currency": "USD",
+                            "image_url":session.userData.cartItem[i].image_url
+                          }
+				i++;
+			}
+		session.send("Payment successfull!!");
+		session.send("Please check your reciept");
+		var msg = new builder.Message(session)
+            .sourceEvent({
+                facebook: {
+					"attachment":{
+      "type":"template",
+      "payload":{
+        "template_type":"receipt",
+        "recipient_name":"Stephane Crozatier",
+        "order_number":"12345678902",
+        "currency":"USD",
+        "payment_method":"Visa 2345",        
+        "order_url":"http://petersapparel.parseapp.com/order?order_id=123456",
+        "timestamp":"1428444852", 
+        "elements":[
+          {
+            "title":"Classic White T-Shirt",
+            "subtitle":"100% Soft and Luxurious Cotton",
+            "quantity":2,
+            "price":50,
+            "currency":"USD",
+            "image_url":"http://petersapparel.parseapp.com/img/whiteshirt.png"
+          },
+          {
+            "title":"Classic Gray T-Shirt",
+            "subtitle":"100% Soft and Luxurious Cotton",
+            "quantity":1,
+            "price":25,
+            "currency":"USD",
+            "image_url":"http://petersapparel.parseapp.com/img/grayshirt.png"
+          }
+        ],
+        "address":{
+          "street_1":"1 Hacker Way",
+          "street_2":"",
+          "city":"Menlo Park",
+          "postal_code":"94025",
+          "state":"CA",
+          "country":"US"
+        },
+        "summary":{
+          "subtotal":75.00,
+          "shipping_cost":4.95,
+          "total_tax":6.19,
+          "total_cost":56.14
+        },
+        "adjustments":[
+          {
+            "name":"New Customer Discount",
+            "amount":20
+          },
+          {
+            "name":"$10 Off Coupon",
+            "amount":10
+          }
+        ]
+      }
+    }
+	}
+			});
+        session.endDialog(msg);
+		}
 	}
 ])
 
