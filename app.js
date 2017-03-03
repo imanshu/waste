@@ -615,14 +615,6 @@ dialog.matches('Buy', [
             "price":50,
             "currency":"USD",
             "image_url":"http://petersapparel.parseapp.com/img/whiteshirt.png"
-          },
-          {
-            "title":"Classic Gray T-Shirt",
-            "subtitle":"100% Soft and Luxurious Cotton",
-            "quantity":1,
-            "price":25,
-            "currency":"USD",
-            "image_url":"http://petersapparel.parseapp.com/img/grayshirt.png"
           }],
         "address":{
           "street_1":"1 Hacker Way",
