@@ -644,10 +644,10 @@ dialog.matches('Buy', [
           "country":"US"
         },
         "summary":{
-          "subtotal":75.00,
-          "shipping_cost":4.95,
-          "total_tax":6.19,
-          "total_cost":56.14
+          "subtotal"      : session.userData.subtotal,
+          "shipping_cost" : session.userData.shipping,
+          "total_tax"     : session.userData.tax,
+          "total_cost"    : session.userData.total
         },
         "adjustments":[
           {
