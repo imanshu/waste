@@ -589,26 +589,6 @@ dialog.matches('Buy', [
 	},
 	function(session, results){
 		if (results.response) {
-			var i = 0, j = 0;
-			var receipt= [];
-			var str = "";
-			var subtotal = [];
-		    while(session.userData.cartItem[j]){
-			str = session.userData.cartItem[j].subtitle;
-			str = str.substring(0, str.length-1);
-			subtotal[j] = parseFloat(str).toFixed(2);
-			j++;
-			}
-			while(session.userData.cartItem[i]){
-				receipt[i] = {
-                            "title": session.userData.cartItem[i].title,
-                            "quantity":1,
-                            "price": subtitle[i],
-                            "currency": "USD",
-                            "image_url":session.userData.cartItem[i].image_url
-                          }
-				i++;
-			}
 		var time = Math.floor(Date.now() / 1000);
 		var timeStamp = time.toString();
 		session.send("Payment successfull!!");
