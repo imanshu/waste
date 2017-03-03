@@ -591,6 +591,26 @@ dialog.matches('Buy', [
 		if (results.response) {
 		var time = Math.floor(Date.now() / 1000);
 		var timeStamp = time.toString();
+		var i = 0, j = 0;
+			var receipt= [];
+			var str = "";
+			var subtotal = [];
+		    while(session.userData.cartItem[j]){
+			str = session.userData.cartItem[j].subtitle;
+			str = str.substring(0, str.length-1);
+			subtotal[j] = parseFloat(str).toFixed(2);
+			j++;
+			}
+			while(session.userData.cartItem[i]){
+				receipt[i] = {
+                            "title": session.userData.cartItem[i].title,
+                            "quantity":1,
+                            "price": subtotal[i],
+                            "currency": "USD",
+                            "image_url":session.userData.cartItem[i].image_url
+                          }
+				i++;
+			}
 		session.send("Payment successfull!!");
 		session.send("Please check your reciept");
 		var msg = new builder.Message(session)
@@ -607,15 +627,7 @@ dialog.matches('Buy', [
         "merchant_name": "Walmart",		
         "order_url":"http://petersapparel.parseapp.com/order?order_id=123456",
         "timestamp": timeStamp, 
-        "elements": [
-          {
-            "title":"Classic White T-Shirt",
-            "subtitle":"100% Soft and Luxurious Cotton",
-            "quantity":2,
-            "price":50,
-            "currency":"USD",
-            "image_url":"http://petersapparel.parseapp.com/img/whiteshirt.png"
-          }],
+        "elements": JSON.stringify(receipt, null, 4),
         "address":{
           "street_1":"1 Hacker Way",
           "street_2":"",
