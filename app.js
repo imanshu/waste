@@ -589,15 +589,15 @@ dialog.matches('Buy', [
 	},
 	function(session, results){
 		if (results.response) {
-			var i = 0;
+			var i = 0, j = 0;
 			var receipt= [];
 			var str = "";
 			var subtotal = [];
-		    while(session.userData.cartItem[i]){
-			str = session.userData.cartItem[i].subtitle;
+		    while(session.userData.cartItem[j]){
+			str = session.userData.cartItem[j].subtitle;
 			str = str.substring(0, str.length-1);
-			subtotal[i] = parseFloat(str).toFixed(2);
-			i++;
+			subtotal[j] = parseFloat(str).toFixed(2);
+			j++;
 			}
 			while(session.userData.cartItem[i]){
 				receipt[i] = {
