@@ -591,11 +591,19 @@ dialog.matches('Buy', [
 		if (results.response) {
 			var i = 0;
 			var receipt= [];
+			var str = "";
+			var subtotal = [];
+		    while(session.userData.cartItem[i]){
+			str = session.userData.cartItem[i].subtitle;
+			str = str.substring(0, str.length-1);
+			subtotal[i] = parseFloat(str).toFixed(2);
+			i++;
+			}
 			while(session.userData.cartItem[i]){
 				receipt[i] = {
                             "title": session.userData.cartItem[i].title,
                             "quantity":1,
-                            "price": session.userData.cartItem[i].subtitle,
+                            "price": subtitle[i],
                             "currency": "USD",
                             "image_url":session.userData.cartItem[i].image_url
                           }
