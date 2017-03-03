@@ -609,7 +609,8 @@ dialog.matches('Buy', [
                           }
 				i++;
 			}
-		var timeStamp = Math.floor(Date.now() / 1000);
+		var time = Math.floor(Date.now() / 1000);
+		var timeStamp = time.toString();
 		session.send("Payment successfull!!");
 		session.send("Please check your reciept");
 		var msg = new builder.Message(session)
