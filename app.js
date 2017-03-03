@@ -613,7 +613,8 @@ dialog.matches('Buy', [
         "recipient_name":"Stephane Crozatier",
         "order_number":"12345678902",
         "currency":"USD",
-        "payment_method":"Visa 2345",        
+        "payment_method":"Visa 1234", 
+        "merchant_name": "Walmart",		
         "order_url":"http://petersapparel.parseapp.com/order?order_id=123456",
         "timestamp":"1428444852", 
         "elements":[
