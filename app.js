@@ -716,9 +716,19 @@ dialog.matches('Buy', [
 			}
 		  }
 		});	
+		session.send(msg);
+		builder.Prompts.choice(session, "Go to Home Page",['Home']);
+		}
+	},
+	function(session, results){
+		if (results.response) {
 		sess.maincart = [];
 		session.userData.cartItem = [];
-		session.endDialog(msg);
+		sess.endDailog();
+		}else {
+			sess.maincart = [];
+			session.userData.cartItem = [];
+			sess.endDailog();
 		}
 	}
 ])
