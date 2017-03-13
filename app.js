@@ -76,7 +76,6 @@ capitalize = function(str) {
 }
 
 addCart = function(session, data){	
-    session.userData.remove = sess.number + "removeitem" ;
 	sess.maincart[sess.number] = { "title"    : data.name,
 					               "subtitle" : data.salePrice + '$',
 					               "image_url": data.thumbnailImage ,
@@ -89,7 +88,6 @@ addCart = function(session, data){
 	               }
   	session.userData.cartItem = sess.maincart;
 	sess.number += 1;
-	
 	session.send("This item is been added to cart");
 }
 
@@ -558,6 +556,11 @@ dialog.matches('Greeting', function (session, args) {
 dialog.matches('None', function (session, args) {
 	console.log ('in none intent');	
 	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");
+	 session.sendTyping();
+    lookupItemsAsync(function (results) {
+        // OK to call session.send() here.
+        session.send(results.message);
+    });
     session.endDialog();	
 });
 
@@ -604,7 +607,7 @@ dialog.matches('Buy', [
 	},
 	function(session, results){
 		if (results.response) {
-		var time = Math.floor(Date.now() / 1000);
+		var time = Math.floor(Date.now()/1);
 		var timeStamp = time.toString();
 		var i = 0, j = 0;
 		var receipt= [];
