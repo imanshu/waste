@@ -7,6 +7,22 @@ sess.number = 0;
 
 var FRONTEND_URL = 'https://helloworldbot12.azurewebsites.net' || 'https://localhost:5000';
 
+WishMe = function(){
+	var currentTime = new Date();
+	var currentOffset = currentTime.getTimezoneOffset();
+	var ISTOffset = 330;   // IST offset UTC +5:30 
+	var myDate = new Date(currentTime.getTime() + (ISTOffset + currentOffset)*60000);
+    if (myDate.getHours()>4 && myDate.getHours() < 12 ){ 
+    return "Good Morning!"
+	} else if (myDate.getHours() >= 12 && myDate.getHours() <= 17 ) { 
+	return "Good Afternoon!"; 
+	} else if ( myDate.getHours() > 17 && myDate.getHours() <= 24 ) { 
+	return "Good Evening!";
+	}else {
+		return "I guess it is very late now, Anyway"
+	} 
+};
+
 promptThis = function(session){ 
         if(session.userData.gender==""){
 			builder.Prompts.choice(session, "Please select the gender.",['Men','Women']);
@@ -511,11 +527,14 @@ dialog.matches('Show more', function (session, args) {
 // Handling Greeting intent.
 dialog.matches('Greeting', function (session, args) {
 	console.log ('in greeting intent');	
+	var username = session.message;
+	session.send("Hello " +username.address.user.name+ ".");
+	session.send(WishMe());
 	if(session.userData.cartItem !== undefined){
 	sess.maincart = session.userData.cartItem ;
 	sess.number = session.userData.cartItem.length;
 	}
-	session.send("Greetings, Welcome to the Walmart Digital Shoe Bot!!!");
+	session.send("Welcome to the Walmart Digital Shoe Bot!!!");
     //session.send("What are you looking for today?");
 	session.userData = {
 		shoe:  "",
@@ -556,11 +575,6 @@ dialog.matches('Greeting', function (session, args) {
 dialog.matches('None', function (session, args) {
 	console.log ('in none intent');	
 	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");
-	 session.sendTyping();
-    lookupItemsAsync(function (results) {
-        // OK to call session.send() here.
-        session.send(results.message);
-    });
     session.endDialog();	
 });
 
