@@ -12,9 +12,9 @@ WishMe = function(){
 	var myDate = new Date(currentTime.getTime() + (ISTOffset + currentOffset)*60000);
     if (myDate.getHours()>4 && myDate.getHours() < 12 ){ 
     return "Good Morning!"
-	} else if (myDate.getHours() >= 12 && myDate.getHours() <= 17 ) { 
+	} else if (myDate.getHours() >= 12 && myDate.getHours() <= 16 ) { 
 	return "Good Afternoon!"; 
-	} else if ( myDate.getHours() > 17 && myDate.getHours() <= 24 ) { 
+	} else if ( myDate.getHours() > 16 && myDate.getHours() <= 22 ) { 
 	return "Good Evening!";
 	}else {
 		return "I guess it is very late now, Anyway"
