@@ -5,8 +5,6 @@ var sess = require('client-sessions')
 sess.maincart = [];
 sess.number = 0;
 
-var FRONTEND_URL = 'https://helloworldbot12.azurewebsites.net' || 'https://localhost:5000';
-
 WishMe = function(){
 	var currentTime = new Date();
 	var currentOffset = currentTime.getTimezoneOffset();
@@ -27,13 +25,13 @@ promptThis = function(session){
         if(session.userData.gender==""){
 			builder.Prompts.choice(session, "Please select the gender.",['Men','Women']);
 		}else if(session.userData.type==""){
-			builder.Prompts.choice(session, "Please select the type of shoe.",['Dress','Casual','Athletic']);
+			builder.Prompts.choice(session, "It is very important to dress according to the occasion or the work you do. So what kind of shoe are you looking for?",['Dress','Casual','Athletic']);
+		}else if(session.userData.size==""){
+			builder.Prompts.choice(session, "What is the size you are looking for?",session.userData.sizes);
 		}else if(session.userData.brand==""){
 			session.beginDialog('/Brand');
 		}else if(session.userData.color==""){
 			builder.Prompts.choice(session, "Please select the color.",session.userData.colors);
-		}else if(session.userData.size==""){
-			builder.Prompts.choice(session, "Please select the size.",session.userData.sizes);
 		}
 }
 
@@ -113,7 +111,7 @@ showItem = function(session, data){
 				.attachments([
 				new builder.HeroCard(session)
 		               .title(data.name)
-					   .subtitle(data.salePrice + '$' )
+					   .subtitle(data.salePrice + '$, Customer Rating: '+data.customerRating+ ', Stock: '+data.stock )
 				       .images([
 					      builder.CardImage.create(session, data.largeImage),
 				         ])
@@ -245,8 +243,50 @@ var recognizer = new builder.LuisRecognizer('https://westus.api.cognitive.micros
 var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
 bot.dialog('/', dialog);
 
-// Handling the Greeting intent. 
+// Handling Greeting intent.
+dialog.matches('Greeting', function (session, args) {
+	console.log ('in greeting intent');	
+	var username = session.message;
+	session.send("Hello " +username.address.user.name+ ". " +WishMe());
+	if(session.userData.cartItem !== undefined){
+	sess.maincart = session.userData.cartItem ;
+	sess.number = session.userData.cartItem.length;
+	}
+	session.send("Welcome to the Walmart Digital Shoe Bot!!!. What are you looking for today?");
+	session.userData = {
+		shoe:  "",
+		gender:"",
+		brand: "",
+		color: "",
+		type:  "",
+		size:  "",
+		path:  "",
+		num:   0,
+		subtotal: 0.0,
+		shipping: 0.0,
+		tax: 0.0,
+		total: 0.0,
+		brands: [],
+		colors: [],
+		sizes: [],
+		cartItem: []
+	};
+	session.endDialog();
+});
+
+// Handling the ShoeSearch intent. 
 dialog.matches('ShoeSearch', function (session, args, next) {
+	if(session.userData.shoe !== undefined){session.dialogData = session.userData;}
+	else {
+		session.dialogData = {
+			shoe:  "",
+			gender:"",
+			brand: "",
+			color: "",
+			type:  "",
+			size:  ""
+		}
+	}
 	console.log ('in shoesearch intent ');
 	var shoe = builder.EntityRecognizer.findEntity(args.entities, 'Shoe');
 	var gender = builder.EntityRecognizer.findEntity(args.entities, 'Gender');
@@ -255,12 +295,12 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 	var type = builder.EntityRecognizer.findEntity(args.entities, 'Shoe::Shoe_type');
 	var size = builder.EntityRecognizer.findEntity(args.entities, 'Shoe::Shoe_size');
 	session.userData = {
-		shoe: shoe ? shoe.entity : "",
-		gender: gender ? capitalize(gender.entity) : "",
-		brand: brand ? brand.entity : "",
-		color: color ? capitalize(color.entity) : "",
-		type: type ? capitalize(type.entity) : "",
-		size: size ? size.entity : "",
+		shoe  : shoe   ? shoe.entity               : session.dialogData.shoe ,
+		gender: gender ? capitalize(gender.entity) : session.dialogData.gender,
+		brand : brand  ? brand.entity              : session.dialogData.brand,
+		color : color  ? capitalize(color.entity)  : session.dialogData.color,
+		type  : type   ? capitalize(type.entity)   : session.dialogData.type,
+		size  : size   ? size.entity               : session.dialogData.size,
     };
 	if(session.userData.brand=="nike"){ session.userData.brand = "Nike"; }
 	if(session.userData.brand=="puma"){session.userData.brand = "PUMA";}
@@ -271,7 +311,6 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 	if(session.userData.brand=="asics"){session.userData.brand = "ASICS";}
 	if((session.userData.brand=="danskin")||(session.userData.brand== "now")){session.userData.brand = "Danskin Now";}
 	if((session.userData.brand=="new")||(session.userData.brand=="balance")){session.userData.brand = "New Balance";}
-	if(session.userData.brand=="puma"){session.userData.brand = "PUMA";}
 	if(session.userData.cartItem !== undefined){
 	sess.maincart = session.userData.cartItem;
 	sess.number = session.userData.cartItem.length;
@@ -290,43 +329,29 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 	//session.send('Hello there! I am the shoe search bot. You are looking for %s %s %s %s for %s of size %s',session.userData.brand,session.userData.type,session.userData.color,session.userData.shoe,session.userData.gender,session.userData.size);		
 	callingApi(session.userData.path, function(data){	
 		showoutput(session,data);
-		promptThis(session);
 		if((session.userData.gender == "")|| (session.userData.type == "")){
-		     session.endDialog();
-		}else if(session.userData.brand != ""){
+			 promptThis(session);
+			 session.endDialog();
+		}else if ((session.userData.brand == "")&&(session.userData.color == "")){
+		session.send("Do you have any certain brand or color in mind? Please mention. ");
 		session.endDialog();
-	    }	
+	    }else {
+			promptThis(session);
+			session.endDialog();
+		}	
 	})   	
 })
 
-dialog.matches('Gender', function (session, args) {
-	var gender = builder.EntityRecognizer.findEntity(args.entities, 'Gender');
-	session.userData.gender = gender ? capitalize(gender.entity) : "",
-	session.userData.page = 0;
-	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
-	callingApi(session.userData.path, function(data){	
-	showoutput(session,data);
-	promptThis(session);
-	if(session.userData.type == ""){
-		     session.endDialog();
-	}else if(session.userData.brand != ""){
+dialog.matches('Property Show', function (session, args, next) {
+	var property = builder.EntityRecognizer.findEntity(args.entities, 'Property');
+	if((property.entity == "brand") || (property.entity == "brands")){
+		session.send("Ok, Let me show you what all brands available ")
+		session.beginDialog('/Brand');
+	}else {
+		session.send("We have of wide color range of shoes");
+		builder.Prompts.choice(session, "Please select the color.",session.userData.colors);
 		session.endDialog();
-	}
-	})
-})
-
-dialog.matches('Type', function (session, args) {
-	var type = builder.EntityRecognizer.findEntity(args.entities, 'Shoe::Shoe_type');
-	session.userData.type = type ? capitalize(type.entity) : "",
-	session.userData.page = 0;
-	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
-	callingApi(session.userData.path, function(data){	
-	showoutput(session,data);
-	promptThis(session);
-	if(session.userData.brand != ""){
-		session.endDialog();
-	}
-	})
+	}	
 })
 
 dialog.matches('Color', function (session, args, results) {
@@ -342,7 +367,6 @@ dialog.matches('Color', function (session, args, results) {
 	}
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
-	promptThis(session);
 	    session.endDialog();
 	})
 })
@@ -524,53 +548,6 @@ dialog.matches('Show more', function (session, args) {
 			})
 })
 
-// Handling Greeting intent.
-dialog.matches('Greeting', function (session, args) {
-	console.log ('in greeting intent');	
-	var username = session.message;
-	session.send("Hello " +username.address.user.name+ ".");
-	session.send(WishMe());
-	if(session.userData.cartItem !== undefined){
-	sess.maincart = session.userData.cartItem ;
-	sess.number = session.userData.cartItem.length;
-	}
-	session.send("Welcome to the Walmart Digital Shoe Bot!!!");
-    //session.send("What are you looking for today?");
-	session.userData = {
-		shoe:  "",
-		gender:"",
-		brand: "",
-		color: "",
-		type:  "",
-		size:  "",
-		path:  "",
-		num:   0,
-		subtotal: 0.0,
-		shipping: 0.0,
-		tax: 0.0,
-		total: 0.0,
-		brands: [],
-		colors: [],
-		sizes: [],
-		cartItem: []
-	};
-	var msg = new builder.Message(session)
-            .attachments([
-                new builder.HeroCard(session)
-                    .title("Now shopping is Easy")
-                  //.subtitle("The Space Needle is an observation tower in Seattle, Washington, a landmark of the Pacific Northwest, and an icon of Seattle.")
-                    .images([
-                        builder.CardImage.create(session, "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDnxOiqHe_eeILFpHyrmOTBsMLxEqoEHoTo3eS8wCwU6ItKRNU")
-                       ])
-					.buttons([
-					       builder.CardAction.postBack(session, "Men shoes","Men shoes"),
-						   builder.CardAction.postBack(session, "Women shoes", "Women shoes"),
-						   builder.CardAction.postBack(session, "showcart", "Go to Cart"),
-						])
-					]);
-	session.endDialog(msg);
-});
-
 // Handling unrecognized conversations.
 dialog.matches('None', function (session, args) {
 	console.log ('in none intent');	
@@ -727,6 +704,19 @@ bot.dialog('/Brand', [
 	}
 ]);
 
+dialog.matches('End Conversation', function (session, args) {
+	session.send("Thank you for checking in, Hope I helped");
+	session.send("Come back again");
+	session.userData = {
+		shoe:  "",
+		gender:"",
+		brand: "",
+		color: "",
+		type:  "",
+		size:  ""
+	};
+	session.endDialog();
+})
 // Setup Restify Server
 var server = restify.createServer();
 server.post('/api/messages', connector.listen());
