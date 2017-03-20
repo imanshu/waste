@@ -155,8 +155,8 @@ dialog.matches('No', function (session, args) {
 })
 
 bot.dialog('/vacation', function (session, args) {
+	session.send("Make your vacation more memorable and safe by taking all the items that are shown below");
 	if(session.userData.temp == "cold"){
-		session.send("Make your vacation more memorable and safe by taking all the items that are shown below");
 		session.send("1. Base layer shirt with long-sleeves");
         session.send("2. Winter Coat/Jacket, should be water resistant");		
 		session.send("3. Walking/Hiking Boots with Woollen Socks");   
@@ -164,7 +164,6 @@ bot.dialog('/vacation', function (session, args) {
 		if(session.userData.vacation == "treking"){session.send("5. A Treking shoe");}
 		session.endDialog();
 	}else if(session.userData.temp == "hot"){
-		session.send("Make your vacation more memorable and safe by taking all the items that are shown below");
 		session.send("1. Sun Glasses"); 
 		session.send("2. Dress/Running Shoes and Sandals"); 
 		session.send("3. Sun Hat with light/thin Scarf"); 
