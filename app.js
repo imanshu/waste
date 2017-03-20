@@ -12,9 +12,9 @@ WishMe = function(){
 	var myDate = new Date(currentTime.getTime() + (ISTOffset + currentOffset)*60000);
     if (myDate.getHours()>4 && myDate.getHours() < 12 ){ 
     return "Good Morning!"
-	} else if (myDate.getHours() >= 12 && myDate.getHours() <= 17 ) { 
+	} else if (myDate.getHours() >= 12 && myDate.getHours() < 16 ) { 
 	return "Good Afternoon!"; 
-	} else if ( myDate.getHours() > 17 && myDate.getHours() <= 24 ) { 
+	} else if ( myDate.getHours() >= 16 && myDate.getHours() <= 24 ) { 
 	return "Good Evening!";
 	}else {
 		return "I guess it is very late now, Anyway"
@@ -179,9 +179,8 @@ bot.dialog('/office', function (session, args) {
 		session.send("3. Dress shoes with dress socks"); 
 		session.send("4. Pairing Sweater vest"); 
 		session.send("5. Other accessories like tie, belt and a watch");
-		if(session.userData.vacation == "treking"){session.send("6. Treking shoe");}
 		session.endDialog();
-	}else if(session.userData.office == "Conference"){
+	}else if(session.userData.office == "conference"){
 		session.send("Firstly Verify whether or not the conference you attend has any guidelines for dress.  \nHere is the list of few things we are thinking that you might need.");
 		session.send("1. Blazer / Sports Jacket");
 		session.send("2. Dress Pants / Khakis"); 
