@@ -172,7 +172,7 @@ bot.dialog('/vacation', function (session, args) {
 })
 
 bot.dialog('/office', function (session, args) {
-	if(session.userData.office == "office"||"work"){
+	if((session.userData.office == "office")||(session.userData.office =="work")){
 		session.send("If your office does not have written dress code, 'Business Casuals' is a better option for work.  \nHave a look at these, just in case you might be needing");
 		session.send("1.  Shirts that have collars");
 		session.send("2. Dress pants/ Khakis/ Trousers"); 
@@ -181,7 +181,7 @@ bot.dialog('/office', function (session, args) {
 		session.send("5. Other accessories like tie, belt and a watch");
 		if(session.userData.vacation == "treking"){session.send("6. Treking shoe");}
 		session.endDialog();
-	}else if(session.userData.temp == "Conference"){
+	}else if(session.userData.office == "Conference"){
 		session.send("Firstly Verify whether or not the conference you attend has any guidelines for dress.  \nHere is the list of few things we are thinking that you might need.");
 		session.send("1. Blazer / Sports Jacket");
 		session.send("2. Dress Pants / Khakis"); 
