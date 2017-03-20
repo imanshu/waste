@@ -109,7 +109,7 @@ bot.dialog('/Ask Place', function (session, args) {
 
 dialog.matches('Office', function (session, args, next) {
 	console.log ('in ocassion intent ');
-	var office = builder.EntityRecognizer.findEntity(args.entities, 'office');
+	var office = builder.EntityRecognizer.findEntity(args.entities, 'Office');
 	var place = builder.EntityRecognizer.findEntity(args.entities, 'Vacation::country'); 
 	session.userData = {
 		office: office ? office.entity : "",
