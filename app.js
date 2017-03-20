@@ -102,7 +102,7 @@ dialog.matches('Vacation', function (session, args, next) {
  
 bot.dialog('/Ask Place', function (session, args) {
 		console.log("in Ask place dialog");
-	    session.send(session.userData.ocassion);
+	    session.send("A "+session.userData.ocassion);
 		session.send("That's nice. Where are you going to?");
 		session.endDialog();
 });
@@ -116,7 +116,7 @@ dialog.matches('Office', function (session, args, next) {
 		place: place ? place.entity : "",
 		ocassion: "office"
     };
-	session.send("Cool, Then You should look formal in your " +session.userData.office+".");
+	session.send("Cool, Dressing professionally is vital for success in an office. We will help you look formal in your " +session.userData.office+".");
 	session.beginDialog("/Recommend");
 })
 
@@ -156,36 +156,38 @@ dialog.matches('No', function (session, args) {
 
 bot.dialog('/vacation', function (session, args) {
 	if(session.userData.temp == "cold"){
-		session.send("1. Base layer shirt with long-sleeves,  \n2. Woollen Socks,  \n3. Boots,"); 
-		session.send("4. Winter Coat/Jacket,"); 
-		session.send("5. Other accessories like gloves, a scarf and a hat");
-		if(session.userData.vacation == "treking"){session.send("6. Treking shoe");}
+		session.send("1. Base layer shirt with long-sleeves");
+        session.send("2. Winter Coat/Jacket, should be water resistant");		
+		session.send("3. Walking/Hiking Boots with Woollen Socks");   
+		session.send("4. Other accessories like gloves, a scarf and a hat");
+		if(session.userData.vacation == "treking"){session.send("5. A Treking shoe");}
 		session.endDialog();
 	}else if(session.userData.temp == "hot"){
-		session.send("1. Sun Glasses,");
-		session.send("2. Light and thin Scarf,"); 
-		session.send("3. Sun Hat,"); 
-		session.send("4. Dress/Running Shoes and Sandals,"); 
-		session.send("5. Other accessories like Sunscreen, Insulated Water Bottle, Light material clothes");
+		session.send("1. Sun Glasses"); 
+		session.send("2. Dress/Running Shoes and Sandals"); 
+		session.send("3. Sun Hat with light/thin Scarf"); 
+		session.send("4. Other accessories like Sunscreen, Insulated Water Bottle, A towel and Light material clothes");
 		session.endDialog();
 	}
 })
 
 bot.dialog('/office', function (session, args) {
 	if(session.userData.office == "office"||"work"){
-		session.send("1. Base layer shirt with long-sleeves,");
-		session.send("2. Woollen Socks,"); 
-		session.send("3. Boots,"); 
-		session.send("4. Winter Coat/Jacket,"); 
-		session.send("5. Other accessories like gloves, a scarf and a hat");
+		session.send("If your office does not have written dress code, 'Business Casuals' is a better option for work.  \nHave a look at these, just in case you might be needing");
+		session.send("1.  Shirts that have collars");
+		session.send("2. Dress pants/ Khakis/ Trousers"); 
+		session.send("3. Dress shoes with dress socks"); 
+		session.send("4. Pairing Sweater vest"); 
+		session.send("5. Other accessories like tie, belt and a watch");
 		if(session.userData.vacation == "treking"){session.send("6. Treking shoe");}
 		session.endDialog();
-	}else if(session.userData.temp == "hot"){
-		session.send("1. Sun Glasses,");
-		session.send("2. Light and thin Scarf,"); 
-		session.send("3. Sun Hat,"); 
-		session.send("4. Dress/Running Shoes and Sandals,"); 
-		session.send("5. Other accessories like Sunscreen, Insulated Water Bottle, Light material clothes");
+	}else if(session.userData.temp == "Conference"){
+		session.send("Firstly Verify whether or not the conference you attend has any guidelines for dress.  \nHere is the list of few things we are thinking that you might need.");
+		session.send("1. Blazer / Sports Jacket");
+		session.send("2. Dress Pants / Khakis"); 
+		session.send("3. Collared shirt or Polo shirt"); 
+		session.send("4. Dress Shoes with matching socks"); 
+		session.send("5. Other accessories like tie, belt and a watch");
 		session.endDialog();
 	}
 })
