@@ -82,7 +82,7 @@ dialog.matches('Welcome', function (session, args, next) {
 })
 
 dialog.matches('Vacation', function (session, args, next) {
-	console.log ('in ocassion intent ');
+	console.log ('in vacation intent ');
 	var vacation = builder.EntityRecognizer.findEntity(args.entities, 'Vacation');
 	var place = builder.EntityRecognizer.findEntity(args.entities, 'Vacation::country'); 
 	session.userData = {
@@ -100,15 +100,8 @@ dialog.matches('Vacation', function (session, args, next) {
 	}	
 })
  
-bot.dialog('/Ask Place', function (session, args) {
-		console.log("in Ask place dialog");
-	    session.send("A "+session.userData.ocassion);
-		session.send("That's nice. Where are you going to?");
-		session.endDialog();
-});
-
 dialog.matches('Office', function (session, args, next) {
-	console.log ('in ocassion intent ');
+	console.log ('in office intent ');
 	var office = builder.EntityRecognizer.findEntity(args.entities, 'Office');
 	var place = builder.EntityRecognizer.findEntity(args.entities, 'Vacation::country'); 
 	session.userData = {
@@ -117,6 +110,35 @@ dialog.matches('Office', function (session, args, next) {
 		ocassion: "office"
     };
 	session.send("Cool, Dressing professionally is vital for success in an office. We will help you look formal in your " +session.userData.office+".");
+	session.beginDialog("/Recommend");
+})
+
+dialog.matches('Sports', function (session, args, next) {
+	console.log ('in sports intent ');
+	var sports = builder.EntityRecognizer.findEntity(args.entities, 'Sports');
+	var game = builder.EntityRecognizer.findEntity(args.entities, 'Sports::Games'); 
+	session.userData = {
+		sports: sports ? sports.entity : "",
+		game: game ? game.entity : "",
+		ocassion: "sports"
+    };
+	if(session.userData.sports == ""){
+	if(session.userData.game != ""){ session.userData.sports = "sports"; }}
+	if(session.userData.game == ""){
+		session.beginDialog("/Ask Game");
+	}
+	session.send("Best of luck for the coming competiton. We know what are the required things for the "+session.userData.game+" competition.");
+	session.beginDialog("/Recommend");
+})
+
+dialog.matches('Gym', function (session, args, next) {
+	console.log ('in gym intent ');
+	var gym = builder.EntityRecognizer.findEntity(args.entities, 'Gym');
+	session.userData = {
+		gym: gym ? gym.entity : "",
+		ocassion: "gym"
+    };
+	session.send(session.userData.gym+" is a must to live a healthy and a long life.");
 	session.beginDialog("/Recommend");
 })
 
@@ -144,7 +166,6 @@ bot.dialog('/RecommendVac', function (session, args) {
 		session.endDialog();
 });
 
-
 dialog.matches('Yes', function (session, args) {
 	session.beginDialog('/' +session.userData.ocassion);
 })
@@ -153,6 +174,19 @@ dialog.matches('No', function (session, args) {
 	session.send('OK, What are you looking for?');
 	session.endDialog();
 })
+
+bot.dialog('/Ask Place', function (session, args) {
+		console.log("in Ask place dialog");
+	    session.send("A "+session.userData.ocassion);
+		session.send("That's nice. Where are you going to?");
+		session.endDialog();
+});
+
+bot.dialog('/Ask Game', function (session, args) {
+		console.log("in Ask game dialog");
+		session.send("Which "+session.UserData.sports+" are you going to play?");
+		session.endDialog();
+});
 
 bot.dialog('/vacation', function (session, args) {
 	session.send("Make your vacation more memorable and safe by taking all the items that are shown below");
@@ -190,6 +224,36 @@ bot.dialog('/office', function (session, args) {
 		session.send("5. Other accessories like tie, belt and a watch");
 		session.endDialog();
 	}
+})
+
+bot.dialog('/sports', function (session, args) {
+	if((session.userData.office == "office")||(session.userData.office =="work")){
+		session.send("If your office does not have written dress code, 'Business Casuals' is a better option for work.  \nHave a look at these, just in case you might be needing");
+		session.send("1.  Shirts that have collars");
+		session.send("2. Dress pants/ Khakis/ Trousers"); 
+		session.send("3. Dress shoes with dress socks"); 
+		session.send("4. Pairing Sweater vest"); 
+		session.send("5. Other accessories like tie, belt and a watch");
+		session.endDialog();
+	}else if(session.userData.office == "conference"){
+		session.send("Firstly Verify whether or not the conference you attend has any guidelines for dress.  \nHere is the list of few things we are thinking that you might need.");
+		session.send("1. Blazer / Sports Jacket");
+		session.send("2. Dress Pants / Khakis"); 
+		session.send("3. Collared shirt or Polo shirt"); 
+		session.send("4. Dress Shoes with matching socks"); 
+		session.send("5. Other accessories like tie, belt and a watch");
+		session.endDialog();
+	}
+})
+
+bot.dialog('/gym', function (session, args) {
+	    session.send("“It’s dangerous to go alone! Take this.”");
+		session.send("1. Light weight and supportive shoe and socks.  you may prefer lifting shoes to traditional cross-trainers or running shoes.");
+		session.send("2. Some breathable, well-fitted clothing. Shorts and Tshirts"); 
+		session.send("3. A gym bag"); 
+		session.send("4. Music Headphones/ipod"); 
+		session.send("5. Other accessories like water-bottle, Towel, Sweat bands etc., ");
+		session.endDialog();
 })
 
 // Handling unrecognized conversations.
