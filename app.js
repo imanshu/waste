@@ -463,6 +463,7 @@ bot.dialog('/sports', function (session, args) {
 		session.send("5. Other accessories like tie, belt and a watch");
 		session.endDialog();
 	}
+	session.endDialog();
 })
 
 bot.dialog('/gym', function (session, args) {
