@@ -96,7 +96,7 @@ addCart = function(session, data){
 								   "buttons":[
                                              {
                                                 "type":"postback",
-												"payload": data.salePrice + " removeitem",
+												"payload": data.salePrice + " remove item",
                                                 "title":"Remove item"
                                              }  ]
 	               }
@@ -116,7 +116,7 @@ showItem = function(session, data){
 					      builder.CardImage.create(session, data.largeImage),
 				         ])
 				       .buttons([
-					       builder.CardAction.postBack(session, "additem "+ parseInt(data.itemId) +" to cart","Add to Cart"),
+					       builder.CardAction.postBack(session, "add item "+ parseInt(data.itemId) +" to cart","Add to Cart"),
 						   builder.CardAction.postBack(session, "Show more", "Show more"),
 						])
 				       ]);
@@ -139,9 +139,10 @@ showoutput = function(session,data){
 					       builder.CardImage.create(session, data.items[i].thumbnailImage) 
 				       ])
 				       .buttons([
-					       builder.CardAction.postBack(session, "showitem  "+ parseInt(data.items[i].itemId),"Show item"),
-						   builder.CardAction.postBack(session, "showitem  "+ parseInt(data.items[i].itemId),"Show item")
+					       builder.CardAction.postBack(session, "show item "+ parseInt(data.items[i].itemId),"Show item"),
+						   builder.CardAction.postBack(session, "add item "+ parseInt(data.items[i].itemId) +" to cart","Add to Cart")
 				       ])
+			    console.log("show item "+ parseInt(data.items[i].itemId));
 				i++;
 				}
 		if(data.items[9] !== undefined){	
@@ -368,14 +369,15 @@ dialog.matches('Sports', function (session, args, next) {
 	if(session.userData.game != ""){ session.userData.sports = "sports"; }}
 	if(session.userData.game == ""){
 		session.beginDialog("/Ask Game");
-	}
+	}else {
 	session.send("Best of luck for the coming competiton. We know what are the required things for the "+session.userData.game+" competition.");
 	session.beginDialog("/Recommend");
+	}
 })
 
 bot.dialog('/Ask Game', function (session, args) {
 		console.log("in Ask game dialog");
-		session.send("Which "+session.UserData.sports+" are you going to play?");
+		session.send("Which "+session.userData.sports+" or game, are you going to play?");
 		session.endDialog();
 });
 
@@ -464,9 +466,9 @@ bot.dialog('/sports', function (session, args) {
 })
 
 bot.dialog('/gym', function (session, args) {
-	    session.send("“It’s dangerous to go alone! Take this.”");
+	    session.send("“It’s dangerous to go alone ;) .  Take this.”");
 		session.send("1. Light weight and supportive shoe and socks.  you may prefer lifting shoes to traditional cross-trainers or running shoes.");
-		session.send("2. Some breathable, well-fitted clothing. Shorts and Tshirts"); 
+		session.send("2. Any breathable, well-fitted clothing. Shorts and Tshirts"); 
 		session.send("3. A gym bag"); 
 		session.send("4. Music Headphones/ipod"); 
 		session.send("5. Other accessories like water-bottle, Towel, Sweat bands etc., ");
@@ -622,7 +624,7 @@ dialog.matches('Add Cart', function (session, args, results) {
 	}else {
 		callingApi(session.userData.path, function(data){	
 		addCart(session,data);
-		builder.Prompts.choice(session, "Select any one option",['Showcart','Continue Shopping']);
+		builder.Prompts.choice(session, "Select any one option",['Go to cart','Continue Shopping']);
 		session.endDialog();
 		})
 	}
