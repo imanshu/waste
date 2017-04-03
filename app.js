@@ -560,13 +560,10 @@ dialog.matches('Color', function (session, args, results) {
 
 dialog.matches('Size', function (session, args, results) {
 	console.log("in size intent");
-	session.send("in size intent");
 	var size = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
 	session.userData.size = size ? size.entity : "";
 	session.userData.page = 0;
-	session.send("hi "+session.userData.size);
-	session.send(session.userData.size+1);
 	session.send("Wow.. ok, I will show you what we have got");
 	if(any){
 			session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:&format=json&start=1&numItems=10";
@@ -858,9 +855,7 @@ dialog.matches('Buy', [
 bot.dialog('/Clear all', function(session, results){
 		session.send("Thank you for shopping.");
 		sess.maincart = [];
-		//session.userData = {
-		//	cartItem: []
-		//};
+		session.userData.cartItem = [];
 		session.endDailog();
 })
 	
