@@ -579,7 +579,7 @@ dialog.matches('Size', function (session, args, results) {
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
 	session.userData.size = size ? size.entity : "";
 	session.userData.page = 0;
-	session.send("hi "session.userData.size);
+	session.send("hi "+session.userData.size);
 	session.send(session.userData.size+1);
 	session.send("Wow.. ok, I will show you what we have got");
 	if(any){
