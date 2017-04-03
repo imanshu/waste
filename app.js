@@ -276,7 +276,6 @@ dialog.matches('Welcome', function (session, args, next) {
 	sess.maincart = session.userData.cartItem ;
 	sess.number = session.userData.cartItem.length;
 	}
-	session.send("Welcome to the Walmart Digital Shoe Bot!!!. What are you looking for today?");
 	session.userData = {
 		shoe:  "",
 		gender:"",
@@ -911,7 +910,6 @@ dialog.matches('End Conversation', function (session, args) {
 	};
 	session.endDialog();
 })
-
 
 // Handling unrecognized conversations.
 dialog.matches('None', function (session, args) {
