@@ -443,24 +443,11 @@ bot.dialog('/office', function (session, args) {
 })
 
 bot.dialog('/sports', function (session, args) {
-	if((session.userData.office == "office")||(session.userData.office =="work")){
-		session.send("If your office does not have written dress code, 'Business Casuals' is a better option for work.  \nHave a look at these, just in case you might be needing");
-		session.send("1.  Shirts that have collars");
-		session.send("2. Dress pants/ Khakis/ Trousers"); 
-		session.send("3. Dress shoes with dress socks"); 
-		session.send("4. Pairing Sweater vest"); 
-		session.send("5. Other accessories like tie, belt and a watch");
+		session.send("");
+		session.send("1. Sports costume for "+session.userData.game);
+		session.send("2. Sports Shoe with socks"); 
+		session.send("4. Other accessories like towel, energy drink, water bottle.");
 		session.endDialog();
-	}else if(session.userData.office == "conference"){
-		session.send("Firstly Verify whether or not the conference you attend has any guidelines for dress.  \nHere is the list of few things we are thinking that you might need.");
-		session.send("1. Blazer / Sports Jacket");
-		session.send("2. Dress Pants / Khakis"); 
-		session.send("3. Collared shirt or Polo shirt"); 
-		session.send("4. Dress Shoes with matching socks"); 
-		session.send("5. Other accessories like tie, belt and a watch");
-		session.endDialog();
-	}
-	session.endDialog();
 })
 
 bot.dialog('/gym', function (session, args) {
@@ -871,7 +858,9 @@ dialog.matches('Buy', [
 bot.dialog('/Clear all', function(session, results){
 		session.send("Thank you for shopping.");
 		sess.maincart = [];
-		session.userData.cartItem = sess.maincart;
+		session.userData = {
+			cartItem: []
+		};
 		session.endDailog();
 })
 	
