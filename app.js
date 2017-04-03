@@ -26,12 +26,12 @@ promptThis = function(session){
 			builder.Prompts.choice(session, "Please select the gender.",['Men','Women']);
 		}else if(session.userData.type==""){
 			builder.Prompts.choice(session, "It is very important to dress according to the occasion or the work you do. So what kind of shoe are you looking for?",['Dress','Casual','Athletic']);
-		}else if(session.userData.size==""){
-			builder.Prompts.choice(session, "What is the size you are looking for?",session.userData.sizes);
 		}else if(session.userData.brand==""){
 			session.beginDialog('/Brand');
 		}else if(session.userData.color==""){
 			builder.Prompts.choice(session, "Please select the color.",session.userData.colors);
+		}else if(session.userData.size==""){
+			builder.Prompts.choice(session, "What is the size you are looking for?",session.userData.sizes);
 		}
 }
 
@@ -527,7 +527,6 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 	    session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	}
 	
-	//session.send('Hello there! I am the shoe search bot. You are looking for %s %s %s %s for %s of size %s',session.userData.brand,session.userData.type,session.userData.color,session.userData.shoe,session.userData.gender,session.userData.size);		
 	callingApi(session.userData.path, function(data){	
 		showoutput(session,data);
 		if((session.userData.gender == "")|| (session.userData.type == "")){
@@ -575,10 +574,13 @@ dialog.matches('Color', function (session, args, results) {
 
 dialog.matches('Size', function (session, args, results) {
 	console.log("in size intent");
+	session.send("in size intent");
 	var size = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
 	session.userData.size = size ? size.entity : "";
 	session.userData.page = 0;
+	session.send("hi "session.userData.size);
+	session.send(session.userData.size+1);
 	session.send("Wow.. ok, I will show you what we have got");
 	if(any){
 			session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:&format=json&start=1&numItems=10";
