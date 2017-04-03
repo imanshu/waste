@@ -549,7 +549,7 @@ dialog.matches('Property Show', function (session, args, next) {
 		session.send("Ok, Let me show you what all brands available ")
 		session.beginDialog('/Brand');
 	}else {
-		session.send("We have of wide color range of shoes");
+		session.send("We have a wide color range of shoes.");
 		builder.Prompts.choice(session, "Please select the color.",session.userData.colors);
 		session.endDialog();
 	}	
@@ -558,10 +558,11 @@ dialog.matches('Property Show', function (session, args, next) {
 dialog.matches('Color', function (session, args, results) {
 	console.log("in color intent");
 	var color = builder.EntityRecognizer.findEntity(args.entities, 'Color');
+	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
 	session.userData.color = color ? capitalize(color.entity) : "";
 	session.userData.page = 0;
 	session.send("Cool. You have got a good taste.")
-	if(session.userData.color == "Any"){
+	if(any){
 			session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	}else {
 	        session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
@@ -575,10 +576,11 @@ dialog.matches('Color', function (session, args, results) {
 dialog.matches('Size', function (session, args, results) {
 	console.log("in size intent");
 	var size = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
-	session.userData.size = size ? deleteSpace(size.entity) : "";
+	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
+	session.userData.size = size ? size.entity : "";
 	session.userData.page = 0;
 	session.send("Wow.. ok, I will show you what we have got");
-	if(session.userData.size == "any"){
+	if(any){
 			session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:&format=json&start=1&numItems=10";
 	}else {
 	        session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
