@@ -797,7 +797,7 @@ dialog.matches('Buy', [
 	},
 	function(session, results){
 		if (results.response) {
-		var time = Math.floor(Date.now()/1);
+		var time = Math.floor(Date.now()/1000);
 		var timeStamp = time.toString();
 		var i = 0, j = 0;
 		var receipt= [];
@@ -865,18 +865,13 @@ dialog.matches('Buy', [
 		  }
 		});	
 		session.send(msg);
-		builder.Prompts.text(session, "Thank you for shopping in Walmart");
 		}
 	},
 	function(session, results){
-		if (results.response) {
+		session.send("Thank you for shopping.");
 		sess.maincart = [];
 		session.userData.cartItem = [];
 		session.endDailog();
-		}else {
-			sess.maincart = [];
-			session.userData.cartItem = [];
-			session.endDailog();
 		}
 	}
 ])
