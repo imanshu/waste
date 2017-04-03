@@ -272,7 +272,30 @@ dialog.matches('Welcome', function (session, args, next) {
 	var username = session.message;
 	session.send("Hello " +username.address.user.name+ ". " +WishMe());
 	session.send("Can I help you in anything. Feel free to ask");
-	session.userData.ocassion = "";
+	if(session.userData.cartItem !== undefined){
+	sess.maincart = session.userData.cartItem ;
+	sess.number = session.userData.cartItem.length;
+	}
+	session.send("Welcome to the Walmart Digital Shoe Bot!!!. What are you looking for today?");
+	session.userData = {
+		shoe:  "",
+		gender:"",
+		brand: "",
+		color: "",
+		type:  "",
+		size:  "",
+		path:  "",
+		num:   0,
+		subtotal: 0.0,
+		shipping: 0.0,
+		tax: 0.0,
+		total: 0.0,
+		brands: [],
+		colors: [],
+		sizes: [],
+		cartItem: [],
+	    ocassion: ""
+	};
 	session.endDialog();
 })
 
@@ -295,6 +318,31 @@ dialog.matches('Vacation', function (session, args, next) {
 	}	
 })
  
+bot.dialog('/Ask Place', function (session, args) {
+		console.log("in Ask place dialog");
+	    session.send("A "+session.userData.ocassion);
+		session.send("That's nice. Where are you going to?");
+		session.endDialog();
+});
+
+bot.dialog('/RecommendVac', function (session, args) {
+		console.log("in recommend dialog");
+		weatherApi(session.userData.place, function(weather){
+			var temp = parseInt(parseInt(weather.main.temp_max)-273);
+			if(temp<=20){
+				session.userData.temp = "cold";
+				session.send(session.userData.place+ " is a very cold place. At this time in the year, there the temperature will be usually near to "+(parseInt(temp/10))*10 +'\xB0C');
+			    session.send("Would you like me to recommend some necessary things you will be needing?")
+		    }else if(temp>=25){
+				session.userData.temp = "hot";
+				session.send(session.userData.place+ " is a hot place. At this time in the year, there the temperature will be usually near to "+((parseInt((temp/10))*10)+10) +'\xB0C');
+			    session.send("Would you like me to recommend some necessary things you will be needing?")
+		    }
+			
+	    });
+		session.endDialog();
+});
+
 dialog.matches('Office', function (session, args, next) {
 	console.log ('in office intent ');
 	var office = builder.EntityRecognizer.findEntity(args.entities, 'Office');
@@ -321,10 +369,17 @@ dialog.matches('Sports', function (session, args, next) {
 	if(session.userData.game != ""){ session.userData.sports = "sports"; }}
 	if(session.userData.game == ""){
 		session.beginDialog("/Ask Game");
-	}
+	}else {
 	session.send("Best of luck for the coming competiton. We know what are the required things for the "+session.userData.game+" competition.");
 	session.beginDialog("/Recommend");
+	}
 })
+
+bot.dialog('/Ask Game', function (session, args) {
+		console.log("in Ask game dialog");
+		session.send("Which "+session.userData.sports+" or game, are you going to play?");
+		session.endDialog();
+});
 
 dialog.matches('Gym', function (session, args, next) {
 	console.log ('in gym intent ');
@@ -343,24 +398,6 @@ bot.dialog('/Recommend', function (session, args) {
 		session.endDialog();
 });
 
-bot.dialog('/RecommendVac', function (session, args) {
-		console.log("in recommend dialog");
-		weatherApi(session.userData.place, function(weather){
-			var temp = parseInt(parseInt(weather.main.temp_max)-273);
-			if(temp<=20){
-				session.userData.temp = "cold";
-				session.send(session.userData.place+ " is a very cold place. At this time in the year, there the temperature will be usually near to "+(parseInt(temp/10))*10 +'\xB0C');
-			    session.send("Would you like me to recommend some necessary things you will be needing?")
-		    }else if(temp>=25){
-				session.userData.temp = "hot";
-				session.send(session.userData.place+ " is a hot place. At this time in the year, there the temperature will be usually near to "+((parseInt((temp/10))*10)+10) +'\xB0C');
-			    session.send("Would you like me to recommend some necessary things you will be needing?")
-		    }
-			
-	    });
-		session.endDialog();
-});
-
 dialog.matches('Yes', function (session, args) {
 	session.beginDialog('/' +session.userData.ocassion);
 })
@@ -369,19 +406,6 @@ dialog.matches('No', function (session, args) {
 	session.send('OK, What are you looking for?');
 	session.endDialog();
 })
-
-bot.dialog('/Ask Place', function (session, args) {
-		console.log("in Ask place dialog");
-	    session.send("A "+session.userData.ocassion);
-		session.send("That's nice. Where are you going to?");
-		session.endDialog();
-});
-
-bot.dialog('/Ask Game', function (session, args) {
-		console.log("in Ask game dialog");
-		session.send("Which "+session.UserData.sports+" are you going to play?");
-		session.endDialog();
-});
 
 bot.dialog('/vacation', function (session, args) {
 	session.send("Make your vacation more memorable and safe by taking all the items that are shown below");
@@ -439,17 +463,19 @@ bot.dialog('/sports', function (session, args) {
 		session.send("5. Other accessories like tie, belt and a watch");
 		session.endDialog();
 	}
+	session.endDialog();
 })
 
 bot.dialog('/gym', function (session, args) {
-	    session.send("“It’s dangerous to go alone! Take this.”");
+	    session.send("“It’s dangerous to go alone ;) .  Take this.”");
 		session.send("1. Light weight and supportive shoe and socks.  you may prefer lifting shoes to traditional cross-trainers or running shoes.");
-		session.send("2. Some breathable, well-fitted clothing. Shorts and Tshirts"); 
+		session.send("2. Any breathable, well-fitted clothing. Shorts and Tshirts"); 
 		session.send("3. A gym bag"); 
 		session.send("4. Music Headphones/ipod"); 
 		session.send("5. Other accessories like water-bottle, Towel, Sweat bands etc., ");
 		session.endDialog();
 })
+
 
 // Handling unrecognized conversations.
 dialog.matches('None', function (session, args) {
