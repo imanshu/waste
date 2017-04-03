@@ -872,7 +872,6 @@ dialog.matches('Buy', [
 		sess.maincart = [];
 		session.userData.cartItem = [];
 		session.endDailog();
-		}
 	}
 ])
  
