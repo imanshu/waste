@@ -28,8 +28,6 @@ promptThis = function(session){
 			builder.Prompts.choice(session, "It is very important to dress according to the occasion or the work you do. So what kind of shoe are you looking for?",['Dress','Casual','Athletic']);
 		}else if(session.userData.color==""){
 			builder.Prompts.choice(session, "Please select the color.",session.userData.colors);
-		}else if(session.userData.brand==""){
-			session.beginDialog('/Brand');
 		}else if(session.userData.size==""){
 			builder.Prompts.choice(session, "What is the size you are looking for?",session.userData.sizes);
 		}
@@ -873,7 +871,7 @@ dialog.matches('Buy', [
 bot.dialog('/Clear all', function(session, results){
 		session.send("Thank you for shopping.");
 		sess.maincart = [];
-		session.userData.cartItem = [];
+		session.userData.cartItem = sess.maincart;
 		session.endDailog();
 })
 	
