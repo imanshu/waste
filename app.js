@@ -858,9 +858,9 @@ dialog.matches('Buy', [
 bot.dialog('/Clear all', function(session, results){
 		session.send("Thank you for shopping.");
 		sess.maincart = [];
-		session.userData = {
-			cartItem: []
-		};
+		//session.userData = {
+		//	cartItem: []
+		//};
 		session.endDailog();
 })
 	
