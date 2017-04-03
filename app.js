@@ -532,7 +532,7 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 		if((session.userData.gender == "")|| (session.userData.type == "")){
 			 promptThis(session);
 			 session.endDialog();
-		}else if ((session.userData.brand == "")&&(session.userData.color == "")){
+		}else if ((session.userData.brand == "")||(session.userData.color == "")){
 		session.send("Do you have any certain brand or color in mind? Please mention. ");
 		session.endDialog();
 	    }else {
@@ -568,6 +568,7 @@ dialog.matches('Color', function (session, args, results) {
 	}
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
+	promptThis(session);
 	    session.endDialog();
 	})
 })
@@ -589,13 +590,13 @@ dialog.matches('Size', function (session, args, results) {
 	}
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
+	promptThis(session);
 	if(!data.items){
 		session.endDialog();
 	}else if(data.items[9] === undefined){
 		session.send("End of Results");
 		session.endDialog();
 			    }
-	promptThis(session);
 	session.endDialog();
 	})
 })
@@ -622,12 +623,12 @@ dialog.matches('Add Cart', function (session, args, results) {
 	session.userData.path = "/v1/items/" + session.userData.itemId + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
 	if(session.userData.cartItem.length > 3){
 		session.send("Maximum 3 items can be added in cart once");
-		builder.Prompts.choice(session, "Check your cart",['showcart']);
+		builder.Prompts.choice(session, "Check your cart",['Show cart']);
 		session.endDailog();
 	}else {
 		callingApi(session.userData.path, function(data){	
 		addCart(session,data);
-		builder.Prompts.choice(session, "Select any one option",['Go to cart','Continue Shopping']);
+		builder.Prompts.choice(session, "Select any one option",['Show cart','Continue Shopping']);
 		session.endDialog();
 		})
 	}
