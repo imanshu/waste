@@ -219,9 +219,10 @@ colorsArray = function(session,data){
 }
 
 weatherApi = function(place, callback){
+	var place1 = removeSpace(place);
     var options = {
 		host: 'api.openweathermap.org',
-		path: '/data/2.5/weather?q=' +place+ '&appid=13a673ce300c31edc72ac96ecbe062b4',
+		path: '/data/2.5/weather?q=' +place1+ '&appid=13a673ce300c31edc72ac96ecbe062b4',
 		method: 'GET'
 	};
         //this is the call
