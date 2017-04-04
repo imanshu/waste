@@ -26,6 +26,8 @@ promptThis = function(session){
 			builder.Prompts.choice(session, "Please select the gender.",['Men','Women']);
 		}else if(session.userData.type==""){
 			builder.Prompts.choice(session, "It is very important to dress according to the occasion or the work you do. So what kind of shoe are you looking for?",['Dress','Casual','Athletic']);
+		}else if(session.userData.brand==""){
+			session.beginDialog('/Brand');
 		}else if(session.userData.color==""){
 			builder.Prompts.choice(session, "Please select the color.",session.userData.colors);
 		}else if(session.userData.size==""){
@@ -45,6 +47,7 @@ deleteSpace = function(string){
 }
 
 removeSpace = function(string){
+	if(string !== undefined){
     var i = string.indexOf(' ');
     if(i>0){
     string = string.substring(0, i) + "%20" + string.substring(i+1, string.length);
@@ -54,6 +57,7 @@ removeSpace = function(string){
 		string = string.substring(0, j) + "%27" + string.substring(j+1, string.length);
 	}
     return string;
+	}
 }
 
 choose_cat = function(gender, type){
@@ -367,7 +371,7 @@ dialog.matches('Sports', function (session, args, next) {
 	if(session.userData.game == ""){
 		session.beginDialog("/Ask Game");
 	}else {
-	session.send("Best of luck for the coming competiton. We know what are the required things for the "+session.userData.game+" competition.");
+	session.send("We know what are the required things for the "+session.userData.game+" competition.");
 	session.beginDialog("/Recommend");
 	}
 })
@@ -412,12 +416,14 @@ bot.dialog('/vacation', function (session, args) {
 		session.send("3. Walking/Hiking Boots with Woollen Socks");   
 		session.send("4. Other accessories like gloves, a scarf and a hat");
 		if(session.userData.vacation == "treking"){session.send("5. A Treking shoe");}
+		session.send("So, What do you want to look at?");
 		session.endDialog();
 	}else if(session.userData.temp == "hot"){
 		session.send("1. Sun Glasses"); 
 		session.send("2. Dress/Running Shoes and Sandals"); 
 		session.send("3. Sun Hat with light/thin Scarf"); 
 		session.send("4. Other accessories like Sunscreen, Insulated Water Bottle, A towel and Light material clothes");
+		session.send("So, What do you want to look at?");
 		session.endDialog();
 	}
 })
@@ -430,6 +436,7 @@ bot.dialog('/office', function (session, args) {
 		session.send("3. Dress shoes with dress socks"); 
 		session.send("4. Pairing Sweater vest"); 
 		session.send("5. Other accessories like tie, belt and a watch");
+		session.send("So, What do you want to look at?");
 		session.endDialog();
 	}else if(session.userData.office == "conference"){
 		session.send("Firstly Verify whether or not the conference you attend has any guidelines for dress.  \nHere is the list of few things we are thinking that you might need.");
@@ -438,15 +445,17 @@ bot.dialog('/office', function (session, args) {
 		session.send("3. Collared shirt or Polo shirt"); 
 		session.send("4. Dress Shoes with matching socks"); 
 		session.send("5. Other accessories like tie, belt and a watch");
+		session.send("So, What do you want to look at?");
 		session.endDialog();
 	}
 })
 
 bot.dialog('/sports', function (session, args) {
-		session.send("");
+		session.send("I wish Best of luck for the coming "+session.userData.game+" competiton.");
 		session.send("1. Sports costume for "+session.userData.game);
 		session.send("2. Sports Shoe with socks"); 
-		session.send("4. Other accessories like towel, energy drink, water bottle.");
+		session.send("3. Other accessories like towel, energy drink, water bottle.");
+		session.send("So, What do you want to look at?");
 		session.endDialog();
 })
 
@@ -457,6 +466,7 @@ bot.dialog('/gym', function (session, args) {
 		session.send("3. A gym bag"); 
 		session.send("4. Music Headphones/ipod"); 
 		session.send("5. Other accessories like water-bottle, Towel, Sweat bands etc., ");
+		session.send("So, What do you want to look at?");
 		session.endDialog();
 })
 
@@ -514,16 +524,17 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 	
 	callingApi(session.userData.path, function(data){	
 		showoutput(session,data);
-		if((session.userData.gender == "")|| (session.userData.type == "")){
-			 promptThis(session);
-			 session.endDialog();
-		}else if ((session.userData.brand == "")||(session.userData.color == "")){
-		session.send("Do you have any certain brand or color in mind? Please mention. ");
-		session.endDialog();
-	    }else {
-			promptThis(session);
-			session.endDialog();
-		}	
+		if((session.userData.gender != "")&&(session.userData.type != "")){
+			if(session.userData.brand == ""){
+				promptThis(session);
+			}else {
+				promptThis(session);
+				session.endDialog();
+			}
+		}else {
+				promptThis(session);
+				session.endDialog();
+		}
 	})   	
 })
 
@@ -603,6 +614,7 @@ dialog.matches('Add Cart', function (session, args, results) {
 	var itemId = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	session.userData.itemId = itemId ? itemId.entity : "";
 	session.userData.path = "/v1/items/" + session.userData.itemId + "?apiKey=ve94zk6wmtmkawhde7kvw9b3&format=json"
+	if(itemId){
 	if(session.userData.cartItem.length > 3){
 		session.send("Maximum 3 items can be added in cart once");
 		builder.Prompts.choice(session, "Check your cart",['Show cart']);
@@ -613,6 +625,10 @@ dialog.matches('Add Cart', function (session, args, results) {
 		builder.Prompts.choice(session, "Select any one option",['Show cart','Continue Shopping']);
 		session.endDialog();
 		})
+	}
+	}else {
+		session.send("Sorry, cannot add item to cart");
+		session.endDialog();
 	}
 })
 
@@ -700,7 +716,7 @@ dialog.matches('Remove Cart', function (session, args, results) {
 				sess.maincart.splice(i,1);
 				sess.number -= 1;
 				session.send("Item removed from the cart");
-	            builder.Prompts.choice(session, "Check our cart.",['showcart']);
+	            builder.Prompts.choice(session, "Check our cart.",['show cart']);
 				break;
 			}
 			i++;
@@ -856,7 +872,7 @@ bot.dialog('/Clear all', function(session, results){
 		session.send("Thank you for shopping.");
 		sess.maincart = [];
 		session.userData.cartItem = [];
-		session.endDailog();
+		session.endDialog();
 })
 	
 bot.dialog('/Brand', [
