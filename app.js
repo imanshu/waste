@@ -767,6 +767,7 @@ dialog.matches('Buy', [
 			 session.send("OK, we found two saved addresses");
 		     builder.Prompts.choice(session, "Please select one address",['Work address','Home address','Cancel']);
 		}else {
+			session.send("ok, Come back sometime to complete your payment");
 			session.endDialog();
 		}
 	},
@@ -775,6 +776,7 @@ dialog.matches('Buy', [
 			 session.send("OK Stephane, we will ship it to your %s", results.response.entity);
 			 builder.Prompts.choice(session, "select shipping method",["Normal shipping(6-7 days) - normal shipping cost", "Fedex(nextday delivery)- extra $5", "USPS(2-3 days delivery)- extra $3",'Cancel']);
 		 }else {
+			session.send("ok, Come back sometime to complete your payment");
 			session.endDialog();
 		}
 	},
@@ -784,6 +786,7 @@ dialog.matches('Buy', [
 			if(results.response.entity == "USPS(2-3 days delivery)- extra $3"){session.userData.shipping += 3;}
 			builder.Prompts.choice(session, "Select card for payment",['VISA 1234','Cancel']);
 		}else {
+			session.send("ok, Come back sometime to complete your payment");
 			session.endDialog();
 		}
 	},
@@ -791,6 +794,7 @@ dialog.matches('Buy', [
 		if (results.response.entity != 'Cancel') {
 		builder.Prompts.number(session, "Give security number of your card VISA 1234");
 		}else {
+			session.send("ok, Come back sometime to complete your payment");
 			session.endDialog();
 		}
 	},
