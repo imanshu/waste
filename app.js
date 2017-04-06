@@ -271,9 +271,11 @@ bot.dialog('/', dialog);
 
 // Handling the Greeting intent. 
 dialog.matches('Welcome', function (session, args, next) {
-	console.log ('in welcome intent');	
 	var username = session.message;
-	session.send("Hello " +username.address.user.name+ ". " +WishMe());
+	console.log ('in welcome intent');
+    session.sendTyping();	
+	session.send("Hello " +username.address.user.name+ ". " );
+	session.send(WishMe());
 	session.send("Can I help you in anything. Feel free to ask");
 	if(session.userData.cartItem !== undefined){
 	sess.maincart = session.userData.cartItem ;
