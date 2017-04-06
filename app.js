@@ -273,9 +273,10 @@ bot.dialog('/', dialog);
 dialog.matches('Welcome', function (session, args, next) {
 	var username = session.message;
 	console.log ('in welcome intent');
+	var wish = WishMe();
     session.sendTyping();	
-	session.send("Hello " +username.address.user.name+ ". " );
-	session.send(WishMe());
+	session.send("Hello " +username.address.user.name+ ".");
+	session.send(wish);
 	session.send("Can I help you in anything. Feel free to ask");
 	if(session.userData.cartItem !== undefined){
 	sess.maincart = session.userData.cartItem ;
@@ -305,6 +306,7 @@ dialog.matches('Welcome', function (session, args, next) {
 
 dialog.matches('Vacation', function (session, args, next) {
 	console.log ('in vacation intent ');
+	session.sendTyping();
 	var vacation = builder.EntityRecognizer.findEntity(args.entities, 'Vacation');
 	var place = builder.EntityRecognizer.findEntity(args.entities, 'Vacation::country'); 
 	session.userData = {
@@ -349,6 +351,7 @@ bot.dialog('/RecommendVac', function (session, args) {
 
 dialog.matches('Office', function (session, args, next) {
 	console.log ('in office intent ');
+	session.sendTyping();
 	var office = builder.EntityRecognizer.findEntity(args.entities, 'Office');
 	var place = builder.EntityRecognizer.findEntity(args.entities, 'Vacation::country'); 
 	session.userData = {
@@ -362,6 +365,7 @@ dialog.matches('Office', function (session, args, next) {
 
 dialog.matches('Sports', function (session, args, next) {
 	console.log ('in sports intent ');
+	session.sendTyping();
 	var sports = builder.EntityRecognizer.findEntity(args.entities, 'Sports');
 	var game = builder.EntityRecognizer.findEntity(args.entities, 'Sports::Games'); 
 	session.userData = {
@@ -403,6 +407,7 @@ bot.dialog('/Recommend', function (session, args) {
 });
 
 dialog.matches('Yes', function (session, args) {
+	session.sendTyping();
 	session.beginDialog('/' +session.userData.ocassion);
 })
 
