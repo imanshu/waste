@@ -271,10 +271,10 @@ bot.dialog('/', dialog);
 
 // Handling the Greeting intent. 
 dialog.matches('Welcome', function (session, args, next) {
+	 session.sendTyping();	
 	var username = session.message;
 	console.log ('in welcome intent');
 	var wish = WishMe();
-    session.sendTyping();	
 	session.send("Hello " +username.address.user.name+ ". Welcome to the Walmart Shoe Bot.");
 	session.send(wish);
 	session.send("Can I help you in anything. Feel free to ask");
