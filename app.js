@@ -630,7 +630,7 @@ dialog.matches('Add Cart', function (session, args, results) {
 		session.endDailog();
 	}else {
 		callingApi(session.userData.path, function(data){
-        if(data.stock == "Availble"){		
+        if(data.stock == "Available"){		
 		addCart(session,data);
 		builder.Prompts.choice(session, "Select any one option",['Show cart','Continue Shopping']);
 		session.endDialog();
