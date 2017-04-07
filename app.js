@@ -628,10 +628,15 @@ dialog.matches('Add Cart', function (session, args, results) {
 		builder.Prompts.choice(session, "Check your cart",['Show cart']);
 		session.endDailog();
 	}else {
-		callingApi(session.userData.path, function(data){	
+		callingApi(session.userData.path, function(data){
+        if(data.stock == "Availble"){		
 		addCart(session,data);
 		builder.Prompts.choice(session, "Select any one option",['Show cart','Continue Shopping']);
 		session.endDialog();
+		}else {
+			session.send("Currently item is Out of stock. You will be notified when the item is available for purchase.");
+			session.endDialog();
+		}
 		})
 	}
 	}else {
@@ -774,7 +779,7 @@ dialog.matches('Buy', [
 			 session.send("OK, we found two saved addresses");
 		     builder.Prompts.choice(session, "Please select one address",['Work address','Home address','Cancel']);
 		}else {
-			session.send("ok, Come back sometime to complete your payment");
+			session.send("OK, Come back after sometime to complete your payment. I will save this item in your cart");
 			session.endDialog();
 		}
 	},
@@ -783,7 +788,7 @@ dialog.matches('Buy', [
 			 session.send("OK Stephane, we will ship it to your %s", results.response.entity);
 			 builder.Prompts.choice(session, "select shipping method",["Normal shipping(6-7 days) - normal shipping cost", "Fedex(nextday delivery)- extra $5", "USPS(2-3 days delivery)- extra $3",'Cancel']);
 		 }else {
-			session.send("ok, Come back sometime to complete your payment");
+			session.send("OK, Come back after sometime to complete your payment. I will save this item in your cart");
 			session.endDialog();
 		}
 	},
@@ -793,7 +798,7 @@ dialog.matches('Buy', [
 			if(results.response.entity == "USPS(2-3 days delivery)- extra $3"){session.userData.shipping += 3;}
 			builder.Prompts.choice(session, "Select card for payment",['VISA 1234','Cancel']);
 		}else {
-			session.send("ok, Come back sometime to complete your payment");
+			session.send("OK, Come back after sometime to complete your payment. I will save this item in your cart");
 			session.endDialog();
 		}
 	},
@@ -801,7 +806,7 @@ dialog.matches('Buy', [
 		if (results.response.entity != 'Cancel') {
 		builder.Prompts.number(session, "Give security number of your card VISA 1234");
 		}else {
-			session.send("ok, Come back sometime to complete your payment");
+			session.send("OK, Come back after sometime to complete your payment. I will save this item in your cart");
 			session.endDialog();
 		}
 	},
