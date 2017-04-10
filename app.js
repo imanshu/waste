@@ -129,9 +129,6 @@ showoutput = function(session,data){
 	session.sendTyping();
 	var i=0;
 	var card = [];
-	session.userData.colors = colorsArray(session, data);
-	session.userData.brands = brandsArray(session, data);
-	session.userData.sizes = sizesArray(session, data);
 	if(!data.items){
 		session.userData.whetherPrompt = 1;
 		session.send("Try another search. No product exists.")
@@ -164,7 +161,10 @@ showoutput = function(session,data){
 				.attachmentLayout(builder.AttachmentLayout.carousel)
 				.attachments(card);
 				session.send(msg);
-	}			
+	}	
+    session.userData.colors = colorsArray(session, data);
+	session.userData.brands = brandsArray(session, data);
+	session.userData.sizes = sizesArray(session, data);	
 }
 
 brandsArray = function(session,data){
