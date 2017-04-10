@@ -129,7 +129,11 @@ showoutput = function(session,data){
 	session.sendTyping();
 	var i=0;
 	var card = [];
+	session.userData.colors = colorsArray(session, data);
+	session.userData.brands = brandsArray(session, data);
+	session.userData.sizes = sizesArray(session, data);
 	if(!data.items){
+		session.userData.whetherPrompt = 1;
 		session.send("Try another search. No product exists.")
 		session.endDialog();
 	}else{
@@ -144,7 +148,6 @@ showoutput = function(session,data){
 					       builder.CardAction.postBack(session, "show item "+ parseInt(data.items[i].itemId),"Show item"),
 						   builder.CardAction.postBack(session, "add item "+ parseInt(data.items[i].itemId) +" to cart","Add to Cart")
 				       ])
-			    console.log("show item "+ parseInt(data.items[i].itemId));
 				i++;
 				}
 		if(data.items[9] !== undefined){	
@@ -153,10 +156,10 @@ showoutput = function(session,data){
                       .buttons([
 					       builder.CardAction.imBack(session, "Show more", "Show more"),
 				       ])
+		}else {
+			card[i] = new builder.HeroCard(session)
+			          .subtitle("End of results!!")
 		}
-		session.userData.colors = colorsArray(session, data);
-		session.userData.brands = brandsArray(session, data);
-		session.userData.sizes = sizesArray(session, data);
 		var msg = new builder.Message(session)
 				.attachmentLayout(builder.AttachmentLayout.carousel)
 				.attachments(card);
@@ -165,9 +168,10 @@ showoutput = function(session,data){
 }
 
 brandsArray = function(session,data){
-    brands = [];	
+    var brands = [];	
 	var j=0;
 	var k=0;
+	if(data.facets){
 	while(data.facets[j]){
 	if(data.facets[j].name == "brand"){
 		while((data.facets[j].facetValues[k])&&(k<9)){
@@ -178,14 +182,16 @@ brandsArray = function(session,data){
 	}
 	j++;
 	}
+	}
 	brands.push("Any Brand");
 	return brands;
 }
 
 sizesArray = function(session,data){
-    sizes = [];	
+    var sizes = [];	
 	var j=0;
 	var k=0;
+	if(data.facets){
 	while(data.facets[j]){
 	if(data.facets[j].name == "shoe_size"){
 		while((data.facets[j].facetValues[k])&&(k<9)){
@@ -196,14 +202,16 @@ sizesArray = function(session,data){
 	}
 	j++;
 	}
+	}
 	sizes.push("Any Size");
 	return sizes;
 }
 
 colorsArray = function(session,data){
-    colors = [];	
+    var colors = [];	
 	var j=0;
 	var k=0;
+	if(data.facets){
 	while(data.facets[j]){
 	if(data.facets[j].name == "color"){
 		while((data.facets[j].facetValues[k])&&(k<9)){
@@ -213,6 +221,7 @@ colorsArray = function(session,data){
 		break;
 	}
 	j++;
+	}
 	}
 	colors.push("Any Color");
 	return colors;
@@ -265,7 +274,7 @@ callingApi = function(path, callback){
 // Create bot and add dialogs
 var connector = new builder.ChatConnector({appId:"c60ece39-e97b-4f50-ae77-d0ac24f07a4f", appPassword:"tYQdi0sEppKbFwaFUOOKbJ4"});
 var bot = new builder.UniversalBot(connector);
-var recognizer = new builder.LuisRecognizer('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/7728bcc7-ea06-471d-b189-0c09e796dc66?subscription-key=a544e8e344c947bbb85eb434961aea87&verbose=true&q=');
+var recognizer = new builder.LuisRecognizer('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/eaad0639-0178-40b8-9c9f-b0db267e2ed8?subscription-key=caad2e27fd634364a3dff4b0adf8b6dd&timezoneOffset=0.0&verbose=true&q=');
 var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
 bot.dialog('/', dialog);
 
@@ -299,7 +308,8 @@ dialog.matches('Welcome', function (session, args, next) {
 		colors: [],
 		sizes: [],
 		cartItem: [],
-	    ocassion: ""
+	    ocassion: "",
+		whetherPrompt: 0
 	};
 	session.endDialog();
 })
@@ -524,10 +534,11 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 	}
     removeSpace(session.userData.brand);
 	session.userData.page = 0;
+	session.userData.whetherPrompt = 0;
 	if(session.userData.brand == "Any Brand"){
 			session.dialogData.brand = "";
 	}else {
-			session.dialogData.brand = session.userData.brand;
+			session.dialogData.brand = session.userData.brand;;
 	}
 	if(session.userData.color == "any"){ 
 			session.dialogData.color = "";
@@ -549,13 +560,13 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 		showoutput(session,data);
 		if((session.userData.gender != "")&&(session.userData.type != "")){
 			if(session.userData.brand == ""){
-				promptThis(session);
+				if(session.userData.whetherPrompt != 1){promptThis(session);}
 			}else {
-				promptThis(session);
+				if(session.userData.whetherPrompt != 1){promptThis(session);}
 				session.endDialog();
 			}
 		}else {
-				promptThis(session);
+				if(session.userData.whetherPrompt != 1){promptThis(session);}
 				session.endDialog();
 		}
 	})   	
@@ -579,11 +590,12 @@ dialog.matches('Color', function (session, args, results) {
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
 	session.userData.color = color ? capitalize(color.entity) : "";
 	session.userData.page = 0;
+	session.userData.whetherPrompt = 0;
 	session.send("Cool. You have got a good taste.");
 	if(session.userData.brand == "Any Brand"){
 			session.dialogData.brand = "";
 	}else {
-			session.dialogData.brand = session.userData.brand;
+			session.dialogData.brand = session.userData.brand;;
 	}
 	if(any){
 		    session.userData.color = "any";
@@ -594,7 +606,7 @@ dialog.matches('Color', function (session, args, results) {
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
-	promptThis(session);
+	if(session.userData.whetherPrompt != 1){promptThis(session);}
 	    session.endDialog();
 	})
 })
@@ -605,11 +617,12 @@ dialog.matches('Size', function (session, args, results) {
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
 	session.userData.size = size ? size.entity : "";
 	session.userData.page = 0;
+	session.userData.whetherPrompt = 0;
 	session.send("Wow.. ok, I will show you what we have got");
 	if(session.userData.brand == "Any Brand"){
 			session.dialogData.brand = "";
 	}else {
-			session.dialogData.brand = session.userData.brand;
+			session.dialogData.brand = session.userData.brand;;
 	}
 	if(session.userData.color == "any"){ 
 			session.dialogData.color = "";
@@ -625,7 +638,7 @@ dialog.matches('Size', function (session, args, results) {
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
-	promptThis(session);
+	if(session.userData.whetherPrompt != 1){promptThis(session);}
 	if(!data.items){
 		session.endDialog();
 	}else if(data.items[9] === undefined){
@@ -774,12 +787,13 @@ dialog.matches('Remove Cart', function (session, args, results) {
 	
 dialog.matches('Show more', function (session, args) {
 	session.userData.page += 1;
+	session.userData.whetherPrompt = 0;
 	session.send("Of course, These are some more similar kind of shoes");
 	session.sendTyping();
 	if(session.userData.brand == "Any Brand"){
 			session.dialogData.brand = "";
 	}else {
-			session.dialogData.brand = session.userData.brand;
+			session.dialogData.brand = session.userData.brand;;
 	}
 	if(session.userData.color == "any"){ 
 			session.dialogData.color = "";
@@ -798,7 +812,7 @@ dialog.matches('Show more', function (session, args) {
 			session.send("End of Results");
 			session.endDialog();
 		}
-		promptThis(session);
+		if(session.userData.whetherPrompt != 1){promptThis(session);}
 		session.endDialog();
 		})
 })
@@ -941,9 +955,9 @@ bot.dialog('/Brand', [
 		if(session.userData.brand == "Any Brand"){
 			session.dialogData.brand = "";
 		}else {
+			session.userData.brand = removeSpace(session.userData.brand);
 			session.dialogData.brand = session.userData.brand;
 		}
-		session.dialogData.brand = removeSpace(session.dialogData.brand);
 		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 		callingApi(session.userData.path, function(data){	
 			showoutput(session,data);
