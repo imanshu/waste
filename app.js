@@ -147,7 +147,7 @@ showoutput = function(session,data){
 				       ])
 				i++;
 				}
-		if(data.items[9] !== undefined){	
+		if(data.totalResults > 10){	
 		card[i] = new builder.HeroCard(session)
                       .subtitle('Want to see Similar kind of shoes? Click below')
                       .buttons([
@@ -613,12 +613,6 @@ dialog.matches('Size', function (session, args, results) {
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
 	if(session.userData.whetherPrompt != 1){promptThis(session);}
-	if(!data.items){
-		session.endDialog();
-	}else if(data.items[9] === undefined){
-		session.send("End of Results");
-		session.endDialog();
-			    }
 	session.endDialog();
 	})
 })
@@ -771,13 +765,9 @@ dialog.matches('Show more', function (session, args) {
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start="+ session.dialogData.page +"1&numItems=10";
 	callingApi(session.userData.path, function(data){
 		showoutput(session,data);
-		if(data.items[9] === undefined){
-			session.send("End of Results");
-			session.endDialog();
-		}
 		if(session.userData.whetherPrompt != 1){promptThis(session);}
 		session.endDialog();
-		})
+	})
 })
 
 dialog.matches('Buy', [
