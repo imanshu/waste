@@ -129,7 +129,7 @@ showoutput = function(session,data){
 	session.sendTyping();
 	var i=0;
 	var card = [];
-	if(!data.items){
+	if(data.totalResults == 0){
 		session.userData.whetherPrompt = 1;
 		session.send("Try another search. No product exists.")
 		session.endDialog();
@@ -537,21 +537,15 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 	session.userData.whetherPrompt = 0;
 	if(session.userData.brand == "Any Brand"){
 			session.dialogData.brand = "";
-	}else {
-			session.dialogData.brand = session.userData.brand;;
 	}
 	if(session.userData.color == "any"){ 
 			session.dialogData.color = "";
-	}else {
-	        session.dialogData.color = session.userData.color;
 	}
 	if(session.userData.size == "any"){
 			session.dialogData.size = "";
-	}else {
-	       session.dialogData.size = session.userData.size;
 	}
 	if(session.userData.gender == ''){
-		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query="+ session.userData.type+ "shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
+		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query="+ session.userData.type+" shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
 	}else{
 	    session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
 	}
