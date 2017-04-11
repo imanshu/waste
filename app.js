@@ -535,23 +535,16 @@ dialog.matches('ShoeSearch', function (session, args, next) {
     removeSpace(session.userData.brand);
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
-	if(session.userData.brand == "Any Brand"){
-			session.dialogData.brand = "";
-	}else {
-			session.dialogData.brand = session.userData.brand;;
-	}
-	if(session.userData.color == "any"){ 
-			session.dialogData.color = "";
-	}else {
-	        session.dialogData.color = session.userData.color;
-	}
-	if(session.userData.size == "any"){
-			session.dialogData.size = "";
-	}else {
-	       session.dialogData.size = session.userData.size;
-	}
-	if(session.userData.gender == ''){
-		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query="+ session.userData.type+" shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
+	session.dialogData = session.userData;
+	if(session.userData.brand == "Any Brand"){session.dialogData.brand = "";}
+	if(session.userData.color == "any"){ session.dialogData.color = "";}
+	if(session.userData.size == "any"){session.dialogData.size = "";}
+	if(session.userData.gender == ""){
+		if(session.userData.type == ""){
+			session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&facet=on&facet.filter=gender:&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
+		}else {
+		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query="+ session.userData.type+" shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
+		}
 	}else{
 	    session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
 	}
@@ -588,21 +581,14 @@ dialog.matches('Color', function (session, args, results) {
 	console.log("in color intent");
 	var color = builder.EntityRecognizer.findEntity(args.entities, 'Color');
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
-	session.userData.color = color ? capitalize(color.entity) : "";
+	session.userData.color = color ? capitalize(color.entity) : any.entity;
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
 	session.send("Cool. You have got a good taste.");
-	if(session.userData.brand == "Any Brand"){
-			session.dialogData.brand = "";
-	}else {
-			session.dialogData.brand = session.userData.brand;;
-	}
-	if(any){
-		    session.userData.color = "any";
-			session.dialogData.color = "";
-	}else {
-	        session.dialogData.color = session.userData.color;
-	}
+	session.dialogData = session.userData;
+	if(session.userData.brand == "Any Brand"){session.dialogData.brand = "";}
+	if(session.userData.color == "any"){ session.dialogData.color = "";}
+	if(session.userData.size == "any"){session.dialogData.size = "";}
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
@@ -615,26 +601,14 @@ dialog.matches('Size', function (session, args, results) {
 	console.log("in size intent");
 	var size = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
-	session.userData.size = size ? size.entity : "";
+	session.userData.size = size ? size.entity : any.entity;
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
 	session.send("Wow.. ok, I will show you what we have got");
-	if(session.userData.brand == "Any Brand"){
-			session.dialogData.brand = "";
-	}else {
-			session.dialogData.brand = session.userData.brand;;
-	}
-	if(session.userData.color == "any"){ 
-			session.dialogData.color = "";
-	}else {
-	        session.dialogData.color = session.userData.color;
-	}
-	if(any){
-		    session.userData.size = "any";
-			session.dialogData.size = "";
-	}else {
-	       session.dialogData.size = session.userData.size;
-	}
+	session.dialogData = session.userData;
+	if(session.userData.brand == "Any Brand"){session.dialogData.brand = "";}
+	if(session.userData.color == "any"){ session.dialogData.color = "";}
+	if(session.userData.size == "any"){session.dialogData.size = "";}
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
@@ -790,21 +764,10 @@ dialog.matches('Show more', function (session, args) {
 	session.userData.whetherPrompt = 0;
 	session.send("Of course, These are some more similar kind of shoes");
 	session.sendTyping();
-	if(session.userData.brand == "Any Brand"){
-			session.dialogData.brand = "";
-	}else {
-			session.dialogData.brand = session.userData.brand;;
-	}
-	if(session.userData.color == "any"){ 
-			session.dialogData.color = "";
-	}else {
-	        session.dialogData.color = session.userData.color;
-	}
-	if(session.userData.size == "any"){
-			session.dialogData.size = "";
-	}else {
-	       session.dialogData.size = session.userData.size;
-	}
+	session.dialogData = session.userData;
+	if(session.userData.brand == "Any Brand"){session.dialogData.brand = "";}
+	if(session.userData.color == "any"){ session.dialogData.color = "";}
+	if(session.userData.size == "any"){session.dialogData.size = "";}
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start="+ session.dialogData.page +"1&numItems=10";
 	callingApi(session.userData.path, function(data){
 		showoutput(session,data);
@@ -951,6 +914,7 @@ bot.dialog('/Brand', [
 	},
 	function (session, results) {
 		session.userData.brand = results.response.entity;
+		session.dialogData = session.userData;
 		session.send("Awesome. Have a look at these.")
 		if(session.userData.brand == "Any Brand"){
 			session.dialogData.brand = "";
