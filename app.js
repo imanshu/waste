@@ -490,7 +490,7 @@ bot.dialog('/gym', function (session, args) {
 
 // Handling the ShoeSearch intent. 
 dialog.matches('ShoeSearch', function (session, args, next) {
-	if(session.userData.shoe !== undefined){session.dialogData = session.userData;}
+	if(session.userData.shoe != ""){session.dialogData = session.userData;}
 	else {
 		session.dialogData = {
 			shoe:  "",
@@ -535,6 +535,7 @@ dialog.matches('ShoeSearch', function (session, args, next) {
     removeSpace(session.userData.brand);
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
+	session.dialogData = session.userData;
 	if(session.userData.brand == "Any Brand"){
 			session.dialogData.brand = "";
 	}
