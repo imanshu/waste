@@ -23,7 +23,7 @@ WishMe = function(){
 
 promptThis = function(session){ 
         if(session.userData.gender==""){
-			builder.Prompts.choice(session, "Please select the gender.",['Men','Women']);
+			builder.Prompts.choice(session, "To whom are you looking shoes? Please select the gender.",['Men','Women']);
 		}else if(session.userData.type==""){
 			builder.Prompts.choice(session, "It is very important to dress according to the occasion or the work you do. So what kind of shoe are you looking for?",['Dress','Casual','Athletic']);
 		}else if(session.userData.brand==""){
@@ -128,6 +128,7 @@ showItem = function(session, data){
 showoutput = function(session,data){
 	session.sendTyping();
 	var i=0;
+	var results = (data.totalResults - data.start)
 	var card = [];
 	if(data.totalResults == 0){
 		session.userData.whetherPrompt = 1;
@@ -147,7 +148,7 @@ showoutput = function(session,data){
 				       ])
 				i++;
 				}
-		if(data.totalResults > 10){	
+		if(results > 9){	
 		card[i] = new builder.HeroCard(session)
                       .subtitle('Want to see Similar kind of shoes? Click below')
                       .buttons([
@@ -540,29 +541,20 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 	if(session.userData.color == "any"){ session.dialogData.color = "";}
 	if(session.userData.size == "any"){session.dialogData.size = "";}
 	if(session.userData.gender == ""){
-		if(session.userData.type == ""){
-			session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&facet=on&facet.filter=gender:&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
-		}else {
-		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query="+ session.userData.type+" shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
-		}
+		promptThis(session);
+		session.endDialog();
 	}else{
-	    session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
-	}
-	
-	callingApi(session.userData.path, function(data){	
+	    session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";	
+		callingApi(session.userData.path, function(data){	
 		showoutput(session,data);
-		if((session.userData.gender != "")&&(session.userData.type != "")){
-			if(session.userData.brand == ""){
+		if((session.userData.type != "")&&(session.userData.brand == "")){
 				if(session.userData.whetherPrompt != 1){promptThis(session);}
-			}else {
-				if(session.userData.whetherPrompt != 1){promptThis(session);}
-				session.endDialog();
-			}
 		}else {
 				if(session.userData.whetherPrompt != 1){promptThis(session);}
 				session.endDialog();
 		}
-	})   	
+		})   
+	}		
 })
 
 dialog.matches('Property Show', function (session, args, next) {
