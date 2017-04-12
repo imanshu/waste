@@ -579,7 +579,7 @@ dialog.matches('Color', function (session, args, results) {
 	if(color){
 		session.userData.color = capitalize(color.entity);
 	}else {
-		session.userData.color = "any"; 
+		session.userData.color = any.entity; 
 	}
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
