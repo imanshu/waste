@@ -154,10 +154,13 @@ showoutput = function(session,data){
                       .buttons([
 					       builder.CardAction.imBack(session, "Show more", "Show more"),
 				       ])
-		}/*else {
+		}else {
 			card[i] = new builder.HeroCard(session)
 			          .subtitle("End of results!!")
-		}*/
+					  .buttons([
+					       builder.CardAction.imBack(session, "Hi", "Start new Conversation"),
+				       ])
+		}
 		var msg = new builder.Message(session)
 				.attachmentLayout(builder.AttachmentLayout.carousel)
 				.attachments(card);
