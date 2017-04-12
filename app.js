@@ -156,7 +156,7 @@ showoutput = function(session,data){
 				       ])
 		}else {
 			card[i] = new builder.HeroCard(session)
-			          .subtitle("End of results!!")
+			          .title("I guess I have shown every result related to your search.")
 					  .buttons([
 					       builder.CardAction.imBack(session, "Hi", "Start new Conversation"),
 				       ])
