@@ -580,9 +580,17 @@ dialog.matches('Color', function (session, args, results) {
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
 	session.send("Cool. You have got a good taste.");
-	if(any){session.userData.color = "any"; session.dialogData.color = "";}
-	if(session.userData.brand == "Any Brand"){session.dialogData.brand = "";}
-	if(session.userData.size == "any"){session.dialogData.size = "";}
+	session.dialogData = session.userData;
+	if(any){
+		session.userData.color = "any"; 
+		session.dialogData.color = "";
+	}
+	if(session.userData.brand == "Any Brand"){
+		session.dialogData.brand = "";
+	}
+	if(session.userData.size == "any"){
+		session.dialogData.size = "";
+	}
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
@@ -599,6 +607,7 @@ dialog.matches('Size', function (session, args, results) {
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
 	session.send("Wow.. ok, I will show you what we have got");
+	session.dialogData = session.userData;
 	if(any){session.userData.size = "any"; session.dialogData.size = "";}
 	if(session.userData.brand == "Any Brand"){session.dialogData.brand = "";}
 	if(session.userData.color == "any"){ session.dialogData.color = "";}
