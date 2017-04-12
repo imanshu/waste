@@ -128,7 +128,7 @@ showItem = function(session, data){
 showoutput = function(session,data){
 	session.sendTyping();
 	var i=0;
-	var results = (data.totalResults - data.start)
+	var results = (parseInt(data.totalResults) - parseInt(data.start));
 	var card = [];
 	if(data.totalResults == 0){
 		session.userData.whetherPrompt = 1;
