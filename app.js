@@ -576,13 +576,16 @@ dialog.matches('Color', function (session, args, results) {
 	console.log("in color intent");
 	var color = builder.EntityRecognizer.findEntity(args.entities, 'Color');
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
-	session.userData.color = color ? capitalize(color.entity) : "";
+	if(color){
+		session.userData.color = capitalize(color.entity);
+	}else {
+		session.userData.color = "any"; 
+	}
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
 	session.send("Cool. You have got a good taste.");
 	session.dialogData = session.userData;
 	if(any){
-		session.userData.color = "any"; 
 		session.dialogData.color = "";
 	}
 	if(session.userData.brand == "Any Brand"){
