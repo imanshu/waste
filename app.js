@@ -134,7 +134,7 @@ showoutput = function(session,data){
 		session.userData.whetherPrompt = 1;
 		session.send("Try another search. No product exists.")
 		session.endDialog();
-	}else{
+	}else {
 		while(data.items[i]){
 		card[i] =  new builder.HeroCard(session)
 		               .title(data.items[i].name)
@@ -154,10 +154,10 @@ showoutput = function(session,data){
                       .buttons([
 					       builder.CardAction.imBack(session, "Show more", "Show more"),
 				       ])
-		}else {
+		}/*else {
 			card[i] = new builder.HeroCard(session)
 			          .subtitle("End of results!!")
-		}
+		}*/
 		var msg = new builder.Message(session)
 				.attachmentLayout(builder.AttachmentLayout.carousel)
 				.attachments(card);
