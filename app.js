@@ -576,13 +576,13 @@ dialog.matches('Color', function (session, args, results) {
 	console.log("in color intent");
 	var color = builder.EntityRecognizer.findEntity(args.entities, 'Color');
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
-	session.userData.color = color ? capitalize(color.entity) : any.entity;
+	session.userData.color = color ? capitalize(color.entity) : "";
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
 	session.send("Cool. You have got a good taste.");
 	session.dialogData = session.userData;
 	if(session.userData.brand == "Any Brand"){session.dialogData.brand = "";}
-	if(session.userData.color == "any"){ session.dialogData.color = "";}
+	if(any){session.userData.color = "any"; session.dialogData.color = "";}
 	if(session.userData.size == "any"){session.dialogData.size = "";}
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.userData.size +"&format=json&start=1&numItems=10";
 	callingApi(session.userData.path, function(data){	
@@ -603,7 +603,7 @@ dialog.matches('Size', function (session, args, results) {
 	session.dialogData = session.userData;
 	if(session.userData.brand == "Any Brand"){session.dialogData.brand = "";}
 	if(session.userData.color == "any"){ session.dialogData.color = "";}
-	if(session.userData.size == "any"){session.dialogData.size = "";}
+	if(any){session.userData.size = "any"; session.dialogData.size = "";}
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
