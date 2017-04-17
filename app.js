@@ -539,10 +539,11 @@ dialog.matches('ShoeSearch', function (session, args, next) {
     removeSpace(session.userData.brand);
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
-	session.dialogData = session.userData;
-	if(session.userData.brand == "Any Brand"){session.dialogData.brand = "";}
-	if(session.userData.color == "any"){ session.dialogData.color = "";}
-	if(session.userData.size == "any"){session.dialogData.size = "";}
+	session.dialogData = {
+		brand : (session.userData.brand != "Any Brand") ? session.userData.brand : "",
+		color : (session.userData.color != "any") ? session.userData.color : "",
+		size : (session.userData.size != "any") ? session.userData.size : ""
+	}
 	if(session.userData.gender == ""){
 		promptThis(session);
 		session.endDialog();
@@ -576,23 +577,14 @@ dialog.matches('Color', function (session, args, results) {
 	console.log("in color intent");
 	var color = builder.EntityRecognizer.findEntity(args.entities, 'Color');
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
-	if(color){
-		session.userData.color = capitalize(color.entity);
-	}else {
-		session.userData.color = any.entity; 
-	}
+	session.userData.color = color ? color.entity : "any";
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
 	session.send("Cool. You have got a good taste.");
-	session.dialogData = session.userData;
-	if(any){
-		session.dialogData.color = "";
-	}
-	if(session.userData.brand == "Any Brand"){
-		session.dialogData.brand = "";
-	}
-	if(session.userData.size == "any"){
-		session.dialogData.size = "";
+	session.dialogData = {
+		brand : (session.userData.brand != "Any Brand") ? session.userData.brand : "",
+		color : (session.userData.color != "any") ? session.userData.color : "",
+		size : (session.userData.size != "any") ? session.userData.size : ""
 	}
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
 	callingApi(session.userData.path, function(data){	
@@ -606,14 +598,15 @@ dialog.matches('Size', function (session, args, results) {
 	console.log("in size intent");
 	var size = builder.EntityRecognizer.findEntity(args.entities, 'builtin.number');
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
-	session.userData.size = size ? size.entity : any.entity;
+	session.userData.size =  size ? size.entity : "any";
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
 	session.send("Wow.. ok, I will show you what we have got");
-	session.dialogData = session.userData;
-	if(any){session.userData.size = "any"; session.dialogData.size = "";}
-	if(session.userData.brand == "Any Brand"){session.dialogData.brand = "";}
-	if(session.userData.color == "any"){ session.dialogData.color = "";}
+	session.dialogData = {
+		brand : (session.userData.brand != "Any Brand") ? session.userData.brand : "",
+		color : (session.userData.color != "any") ? session.userData.color : "",
+		size : (session.userData.size != "any") ? session.userData.size : ""
+	}
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
 	callingApi(session.userData.path, function(data){	
 	showoutput(session,data);
@@ -763,10 +756,11 @@ dialog.matches('Show more', function (session, args) {
 	session.userData.whetherPrompt = 0;
 	session.send("Of course, These are some more similar kind of shoes");
 	session.sendTyping();
-	session.dialogData = session.userData;
-	if(session.userData.brand == "Any Brand"){session.dialogData.brand = "";}
-	if(session.userData.color == "any"){ session.dialogData.color = "";}
-	if(session.userData.size == "any"){session.dialogData.size = "";}
+	session.dialogData = {
+		brand : (session.userData.brand != "Any Brand") ? session.userData.brand : "",
+		color : (session.userData.color != "any") ? session.userData.color : "",
+		size : (session.userData.size != "any") ? session.userData.size : ""
+	}
 	session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start="+ session.dialogData.page +"1&numItems=10";
 	callingApi(session.userData.path, function(data){
 		showoutput(session,data);
@@ -908,17 +902,13 @@ bot.dialog('/Brand', [
 		builder.Prompts.choice(session, "Please select the brand.",session.userData.brands);
 	},
 	function (session, results) {
-		session.userData.brand = results.response.entity;
-		session.dialogData = session.userData;
-		session.send("Awesome. Have a look at these.")
-		if(session.userData.brand == "Any Brand"){
-			session.dialogData.brand = "";
-		}else {
-			session.userData.brand = removeSpace(session.userData.brand);
-			session.dialogData.brand = session.userData.brand;
+		session.userData.brand = removeSpace(results.response.entity);
+		session.sendTyping();
+		session.dialogData = {
+			brand : (session.userData.brand != "Any Brand") ? session.userData.brand : "",
+			color : (session.userData.color != "any") ? session.userData.color : "",
+			size : (session.userData.size != "any") ? session.userData.size : ""
 		}
-		if(session.userData.size == "any") {session.dialogData.size = "";}
-	    if(session.userData.color == "any"){ session.dialogData.color = "";}
 		session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
 		callingApi(session.userData.path, function(data){	
 			showoutput(session,data);
