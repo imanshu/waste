@@ -577,7 +577,7 @@ dialog.matches('Color', function (session, args, results) {
 	console.log("in color intent");
 	var color = builder.EntityRecognizer.findEntity(args.entities, 'Color');
 	var any =  builder.EntityRecognizer.findEntity(args.entities, 'Any');
-	session.userData.color = color ? color.entity : "any";
+	session.userData.color = color ? capitalize(color.entity) : "any";
 	session.userData.page = 0;
 	session.userData.whetherPrompt = 0;
 	session.send("Cool. You have got a good taste.");
@@ -902,8 +902,9 @@ bot.dialog('/Brand', [
 		builder.Prompts.choice(session, "Please select the brand.",session.userData.brands);
 	},
 	function (session, results) {
-		session.userData.brand = removeSpace(results.response.entity);
+		session.userData.brand = results.response.entity;
 		session.sendTyping();
+		if(session.userData.brand != "Any Brand"){ session.userData.brand =  removeSpace(session.userData.brand); }
 		session.dialogData = {
 			brand : (session.userData.brand != "Any Brand") ? session.userData.brand : "",
 			color : (session.userData.color != "any") ? session.userData.color : "",
