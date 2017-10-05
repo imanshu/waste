@@ -276,7 +276,7 @@ callingApi = function(path, callback){
 }
 
 // Create bot and add dialogs
-var connector = new builder.ChatConnector({appId:"c60ece39-e97b-4f50-ae77-d0ac24f07a4f", appPassword:"tYQdi0sEppKbFwaFUOOKbJ4"});
+var connector = new builder.ChatConnector({appId:"cfe953e0-1d97-4bfc-84ce-8304a8224db4", appPassword:"fSS0USFvKS7EVBjaYSbmnVm"});
 var bot = new builder.UniversalBot(connector);
 var recognizer = new builder.LuisRecognizer('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/eaad0639-0178-40b8-9c9f-b0db267e2ed8?subscription-key=caad2e27fd634364a3dff4b0adf8b6dd&timezoneOffset=0.0&verbose=true&q=');
 var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
