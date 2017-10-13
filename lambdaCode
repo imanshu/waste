@@ -1,0 +1,262 @@
+
+var APP_ID = undefined;//replace with 'amzn1.echo-sdk-ams.app.[your-unique-value-here]';
+
+var http = require('http'),
+alexaDateUtil = require('./alexaDateUtil');
+
+/**
+ * The AlexaSkill prototype and helper functions
+ */
+var AlexaSkill = require('./AlexaSkill');
+
+/**
+ * BrowseSearch is a child of AlexaSkill.
+ * To read more about inheritance in JavaScript, see the link below.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Introduction_to_Object-Oriented_JavaScript#Inheritance
+ */
+var BrowseSearch = function () {
+    AlexaSkill.call(this, APP_ID);
+};
+
+// Extend AlexaSkill
+BrowseSearch.prototype = Object.create(AlexaSkill.prototype);
+BrowseSearch.prototype.constructor = BrowseSearch;
+
+// ----------------------- Override AlexaSkill request and intent handlers -----------------------
+
+BrowseSearch.prototype.eventHandlers.onSessionStarted = function (sessionStartedRequest, session) {
+    console.log("onSessionStarted requestId: " + sessionStartedRequest.requestId
+        + ", sessionId: " + session.sessionId);
+    // any initialization logic goes here
+};
+
+BrowseSearch.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
+    console.log("onLaunch requestId: " + launchRequest.requestId + ", sessionId: " + session.sessionId);
+    handleWelcomeRequest(response);
+ 
+};
+
+BrowseSearch.prototype.eventHandlers.onSessionEnded = function (sessionEndedRequest, session) {
+    console.log("onSessionEnded requestId: " + sessionEndedRequest.requestId
+        + ", sessionId: " + session.sessionId);
+    //handleEndRequest(response);
+};
+
+/**
+ * override intentHandlers to map intent handling functions.
+ */
+BrowseSearch.prototype.intentHandlers = {
+    "DialogBrowseIntent": function (intent, session, response) {
+        
+        var StoreSlot = intent.slots.Productid;
+        if (StoreSlot && StoreSlot.value) {
+            handleProductInfoRequest(intent, session, response);
+        }
+    },
+	 "NextBrowseIntent": function (intent, session, response) {
+       
+        var QuantitySlot = intent.slots.Quantity;
+         if (QuantitySlot && QuantitySlot.value) {
+            handleQuantitySlotRequest(intent, session, response);
+        } 
+    },
+	"LastBrowseIntent": function (intent, session, response) {
+        
+        //var CheckSlot = session.attributes.checkslot;
+        var ResponseSlot = intent.slots.Response;
+         if (ResponseSlot && ResponseSlot.value) {
+            handleResponseSlotRequest(intent, session, response);
+        } 
+    },
+	"AddBrowseIntent": function (intent, session, response) {
+        
+        var ResponseSlot = intent.slots.Response;
+         if (ResponseSlot && ResponseSlot.value) {
+            handleAddSlotRequest(intent, session, response);
+        } 
+    },
+	"StopIntent": function (intent, session, response) {
+
+        handleEndRequest(intent, session, response);
+    }
+};
+
+
+function handleWelcomeRequest(response) {
+    var whichStorePrompt = "Which Item would you like to place an Order?",
+        speechOutput = {
+            speech: "<speak>Welcome to grocery store. "
+                + whichStorePrompt 
+                + "<break time=\"1s\"/>" 
+                + ""
+                + "</speak>",
+            type: AlexaSkill.speechOutputType.SSML
+        },
+        repromptOutput = {
+            speech: "Walmart Ecommerce Site"
+                + whichStorePrompt,
+            type: AlexaSkill.speechOutputType.PLAIN_TEXT
+        };
+
+    response.ask(speechOutput, repromptOutput);
+}
+function handleEndRequest(intent, session, response) {
+    var whichStorePrompt = " Walmart Grocery Store",
+        speechOutput ="thanks for using " + whichStorePrompt;
+        repromptOutput = "";
+    session.attributes = {};
+
+    response.ask(speechOutput, repromptOutput);
+}
+/**
+ * Handles the dialog step where the user order any item
+ */
+function handleProductInfoRequest(intent, session, response) {
+
+    var productSlot = intent.slots.Productid;
+    var quantitySlot = intent.slots.Quantity;
+    var speechOutput = "";
+    var repromptText = "";
+           
+    
+    session.attributes.productSlot = productSlot;
+    session.attributes.quantitySlot = quantitySlot;
+    session.attributes.responseSlot = "some";
+        //var quantityValue = quantitySlot.value;
+    var saveorder = "";
+    if (!session.attributes.productCount){
+    // set Store in session and prompt for date
+        session.attributes.productCount = 1 ;
+        //saveorder = "order" + "1";
+        //session.attributes[saveorder] ={"product" : productSlot.value , "quantity" : quantitySlot.value}; 
+    } else{
+         
+        session.attributes.productCount = session.attributes.productCount + 1 ;
+        //saveorder = "order" + session.attributes.productCount.toString();
+        //session.attributes[saveorder] ={"product" : productSlot.value , "quantity" : quantitySlot.value};
+    }
+            
+    if (!quantitySlot.value){
+        speechOutput = "we have fresh  " + productSlot.value + " ,  how much quantity you want ?"   ;
+        repromptText = "how much quantity you want ? ";
+        response.ask(speechOutput, repromptText);
+    } else {
+        
+        speechOutput = "you want  to add " + quantitySlot.value + " lbs of " + productSlot.value + " is that correct ";
+        repromptText = "is that correct";
+        response.ask(speechOutput, repromptText);
+    }
+        
+    //makeProductRequest(productSlot, response);
+        //repromptText = "Please Select Quantity for " + productSlot.value;
+        console.log("productSlot session")
+        //response.ask(speechOutput, repromptText);
+    
+}
+function handleQuantitySlotRequest(intent, session, response) {
+
+    var quantitySlot = intent.slots.Quantity;
+         console.log('QuantityInfo is: ' + quantitySlot.value);
+         //console.log("quantity Slot session"+session.attributes.quantitySlot.value)
+    session.attributes.quantitySlot = quantitySlot;
+        // set quantitySlot in session 
+        speechOutput =  "you want  to add " + quantitySlot.value + " of " + session.attributes.productSlot.value + " is that correct ";
+        repromptText = "is that correct";
+        
+        console.log("productSlot session"+session.attributes.productSlot.value)
+        response.ask(speechOutput, repromptText);
+    
+}
+
+function handleResponseSlotRequest(intent, session, response) {
+
+   var responseSlot = intent.slots.Response;
+   var checkSlot = intent.slots.Check;
+   session.attributes.checkSlot = checkSlot;
+   //session.attributes.responseSlot = responseSlot;
+    if ((session.attributes.responseSlot) === "some" && (intent.slots.Response.value) === "yes"){
+        speechOutput = "okay,Your product "+ session.attributes.quantitySlot.value + " lbs of "+ session.attributes.productSlot.value +" added to cart"+"  ,,anything else,Do you want to add  ?";
+        repromptText = " okay,Your product "+ session.attributes.quantitySlot.value + " lbs of  "+ session.attributes.productSlot.value +" added to cart"+"  ,,anything else ,Do you want to add ? ?";
+        var saveorder = "order" + session.attributes.productCount.toString();
+        session.attributes[saveorder] ={"productid" : session.attributes.productSlot.value , "quantity" : session.attributes.quantitySlot.value};
+        //session.attributes.checkSlot = {};
+        session.attributes.responseSlot = intent.slots.Response.value;
+        session.attributes.productSlot = {};
+        session.attributes.quantitySlot= {};
+        response.ask(speechOutput, repromptText);
+    }else if ((intent.slots.Response.value) === "yes"){
+        speechOutput = "okk what you want  to add";
+        repromptText = "okk what you want  to add";
+        session.attributes.productSlot = {};
+        session.attributes.quantitySlot= {};
+        session.attributes.responseSlot= "some";
+        //session.attributes.additem = {};
+        response.ask(speechOutput, repromptText);
+    }else if (session.attributes.productCount === 1){
+        speechOutput = "you have ordered " + session.attributes.order1.quantity + " lbs of "+ session.attributes.order1.productid +" Total cost is 29 dollars,, its will be delivered in 30 minutes. to your home address";
+        repromptText = getFullList(session.attributes);
+        session.attributes.productSlot = {};
+        session.attributes.quantitySlot= {};
+        session.attributes.responseSlot= "some";
+        response.ask(speechOutput, repromptText);
+    }else if (session.attributes.productCount === 2){
+        speechOutput = "you have ordered " + session.attributes.order1.quantity + " lbs of "+ session.attributes.order1.productid + " and " + session.attributes.order2.quantity + " lbs of "+ session.attributes.order2.productid +" Total cost is 47 dollars,, its will be delivered in 30 minutes. to your home address";
+        repromptText = "";
+        session.attributes.productSlot = {};
+        session.attributes.quantitySlot= {};
+        session.attributes.responseSlot= "some";
+        response.ask(speechOutput, repromptText);
+    }else if (session.attributes.productCount === 3){
+        speechOutput = "you have ordered " + session.attributes.order1.quantity + " lbs of "+ session.attributes.order1.productid + " ,, " + session.attributes.order2.quantity + " lbs of "+ session.attributes.order2.productid + " and "+session.attributes.order3.quantity + " lbs of "+ session.attributes.order3.productid +" Total cost is 67 dollars,, its will be delivered in 30 minutes. to your home address";
+        repromptText = "";
+        session.attributes.productSlot = {};
+        session.attributes.quantitySlot= {};
+        session.attributes.responseSlot= "some";
+        response.ask(speechOutput, repromptText);
+    }
+
+}
+
+
+
+function getDataFromWalmart(productname , callbackagain ){
+    var name = productname;
+    var url = 'http://api.walmartlabs.com/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=' + name + '&facet=on&format=json&numItems=4';
+    http.get(url, function(res){
+        var body = '';
+
+        res.on('data', function(chunk){
+           body += chunk;
+        });
+
+       res.on('end', function(){
+           var fbResponse = JSON.parse(body);
+           //global.value = fbResponse.items;
+           callbackagain(fbResponse.items);
+           //console.log(global.value);
+        });
+        
+    })
+    
+}
+
+
+// Create the handler that responds to the Alexa Request.
+exports.handler = function (event, context) {
+    var browseSearch = new BrowseSearch();
+     browseSearch.execute(event, context);
+      console.log('remaining time =', context.getRemainingTimeInMillis());
+    console.log('functionName =', context.functionName);
+    console.log('AWSrequestID =', context.awsRequestId);
+    console.log('logGroupName =', context.logGroupName);
+    console.log('logStreamName =', context.logStreamName);
+    console.log('clientContext =', context.clientContext);
+    if (typeof context.identity !== 'undefined') {
+        console.log('Cognito
+        identity ID =', context.identity.cognitoIdentityId);
+    }    
+    callback(null, event.key1); // Echo back the first key value
+    // or
+    // callback("some error type"); 
+};
